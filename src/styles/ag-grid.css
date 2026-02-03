@@ -49,9 +49,9 @@
   color: hsl(var(--foreground));
 }
 
-/* Flipkart theme header text (white on blue) */
+/* Flipkart theme header text (dark on light blue) */
 .theme-flipkart .ag-theme-alpine .ag-header-cell {
-  color: hsl(0 0% 100%);
+  color: hsl(217 91% 30%);
 }
 
 .ag-theme-alpine .ag-header-cell:hover {
