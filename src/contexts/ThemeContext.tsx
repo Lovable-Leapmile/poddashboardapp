@@ -31,6 +31,16 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     document.documentElement.classList.remove("theme-qikpod", "theme-flipkart");
     document.documentElement.classList.add(skin === "FLIPKART_UI" ? "theme-flipkart" : "theme-qikpod");
     
+    // Update favicon based on skin
+    const favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
+    if (favicon) {
+      if (skin === "FLIPKART_UI") {
+        favicon.href = "/flipkart-favicon.png";
+      } else {
+        favicon.href = "https://leapmile-website.blr1.digitaloceanspaces.com/favicon_new_q.png";
+      }
+    }
+    
     // Update CSS variables based on skin
     const root = document.documentElement;
     
