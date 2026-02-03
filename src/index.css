@@ -55,6 +55,9 @@
     --theme-muted-text: 240 3.8% 46.1%;
     --theme-text-primary: 240 10% 3.9%;
     --theme-bg-light: 0 0% 98%;
+    /* AG Grid header colors */
+    --theme-grid-header-bg: 48 96% 89%; /* amber-100 for QikPod */
+    --theme-grid-header-hover: 48 96% 77%; /* amber-200 for QikPod */
   }
 
   .dark {
@@ -119,6 +122,11 @@
 }
 
 /* Flipkart theme-specific overrides */
+.theme-flipkart {
+  --theme-grid-header-bg: 217 91% 55%; /* Flipkart Blue #2874F0 */
+  --theme-grid-header-hover: 217 91% 45%; /* Darker blue for hover */
+}
+
 .theme-flipkart .theme-sidebar {
   background-color: hsl(0 0% 100%);
   border-right: 1px solid hsl(var(--theme-border));

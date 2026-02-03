@@ -24,7 +24,7 @@
 }
 
 .ag-theme-alpine .ag-header {
-  background: rgb(254 243 199); /* amber-100 */
+  background: hsl(var(--theme-grid-header-bg));
   border-bottom: 1px solid hsl(var(--border));
 }
 
@@ -32,11 +32,10 @@
   border-right: none !important;
   border-bottom: 1px solid hsl(220 13% 91%); /* Light gray border */
   font-weight: 600;
-  color: hsl(var(--foreground));
   font-size: 12px; /* Updated to 12px for uniform font size */
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  background-color: rgb(254 243 199) !important; /* amber-100 */
+  background-color: hsl(var(--theme-grid-header-bg)) !important;
   display: flex;
   align-items: center;
   transition: all 0.2s ease;
@@ -45,8 +44,18 @@
   text-overflow: ellipsis; /* Add ellipsis for overflow text */
 }
 
+/* QikPod theme header text */
+.theme-qikpod .ag-theme-alpine .ag-header-cell {
+  color: hsl(var(--foreground));
+}
+
+/* Flipkart theme header text (white on blue) */
+.theme-flipkart .ag-theme-alpine .ag-header-cell {
+  color: hsl(0 0% 100%);
+}
+
 .ag-theme-alpine .ag-header-cell:hover {
-  background-color: rgb(252 231 159) !important; /* amber-200 for hover */
+  background-color: hsl(var(--theme-grid-header-hover)) !important;
 }
 
 .ag-theme-alpine .ag-cell {
