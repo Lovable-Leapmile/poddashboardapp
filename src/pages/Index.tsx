@@ -1,25 +1,17 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import Login from "@/components/Login";
 import { useAuth } from "@/contexts/AuthContext";
-import { useApiConfig } from "@/contexts/ApiConfigContext";
-import { ApiConfigPopup } from "@/components/ApiConfigPopup";
 import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const { isAuthenticated, isLoading } = useAuth();
-  const { isConfigured, setApiConfig } = useApiConfig();
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Redirect to dashboard after successful authentication
     if (isAuthenticated) {
       navigate("/dashboard");
     }
   }, [isAuthenticated, navigate]);
-
-  const handleApiConfigSubmit = (subdomain: string) => {
-    setApiConfig(subdomain);
-  };
 
   if (isLoading) {
     return (
@@ -31,12 +23,7 @@ const Index = () => {
       </div>
     );
   }
-  // Show API config popup if not configured (staging only)
-  if (!isConfigured) {
-    return <ApiConfigPopup open={true} onConfigSubmit={handleApiConfigSubmit} />;
-  }
 
-  // Show login page if not authenticated
   return <Login />;
 };
 
