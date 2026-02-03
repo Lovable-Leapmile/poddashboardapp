@@ -12,6 +12,7 @@ import { ArrowLeft, RefreshCw, Plus, Search, Eye, Filter, Download } from "lucid
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
+import { useApiUrl } from "@/hooks/useApiUrl";
 import CreatePaymentPopup from "@/components/CreatePaymentPopup";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,6 +28,7 @@ interface PaymentData {
 }
 const PaymentsAgGrid = () => {
   const { accessToken } = useAuth();
+  const apiUrl = useApiUrl();
   const navigate = useNavigate();
   const gridRef = useRef<AgGridReact>(null);
   const [rowData, setRowData] = useState<PaymentData[]>([]);
@@ -42,7 +44,7 @@ const PaymentsAgGrid = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `https://productionv36.qikpod.com/payments/payments/?order_by_field=updated_at&order_by_type=DESC&num_records=${pageSize}`,
+        `${apiUrl.payments}/payments/?order_by_field=updated_at&order_by_type=DESC&num_records=${pageSize}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,

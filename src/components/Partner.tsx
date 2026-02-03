@@ -5,6 +5,8 @@ import { ArrowLeft, Play, Download, Upload, X, ArrowRight } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import PartnerReservationsAgGrid from "./PartnerReservationsAgGrid";
 import { usePartnerStats } from "@/hooks/usePartnerStats";
+import { useApiUrl } from "@/hooks/useApiUrl";
+import { useAuth } from "@/contexts/AuthContext";
 interface PartnerProps {
   onBack: () => void;
 }
@@ -13,6 +15,8 @@ const Partner: React.FC<PartnerProps> = ({ onBack }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const { stats: dashboardStats, loading: statsLoading } = usePartnerStats();
+  const apiUrl = useApiUrl();
+  const { accessToken } = useAuth();
   const downloadSampleCSV = () => {
     const jsonDataList = [
       {
@@ -68,12 +72,11 @@ const Partner: React.FC<PartnerProps> = ({ onBack }) => {
     const formData = new FormData();
     formData.append("in_file", selectedFile);
     try {
-      const response = await fetch("https://productionv36.qikpod.com/podcore/upload_csv/", {
+      const response = await fetch(`${apiUrl.podcore}/upload_csv/`, {
         method: "POST",
         headers: {
           accept: "application/json",
-          Authorization:
-            "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhY2wiOiJhZG1pbiIsImV4cCI6MTkwMDczNDA0MH0.pHhmwwEsMIO-5nyxOvw4G2ntQ7-H2A6hyFdQSci8OCY",
+          Authorization: `Bearer ${accessToken}`,
         },
         body: formData,
       });

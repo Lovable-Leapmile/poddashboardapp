@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
+import { useApiUrl } from "@/hooks/useApiUrl";
 import { useToast } from "@/hooks/use-toast";
 import { Send } from "lucide-react";
 import { LocationDetail } from "@/services/dashboardApi";
@@ -17,6 +18,7 @@ interface EditLocationPopupProps {
 
 const EditLocationPopup: React.FC<EditLocationPopupProps> = ({ open, onOpenChange, locationId, onSuccess }) => {
   const { accessToken } = useAuth();
+  const apiUrl = useApiUrl();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -42,7 +44,7 @@ const EditLocationPopup: React.FC<EditLocationPopupProps> = ({ open, onOpenChang
 
     setIsLoading(true);
     try {
-      const response = await fetch(`https://productionv36.qikpod.com/podcore/locations/?record_id=${locationId}`, {
+      const response = await fetch(`${apiUrl.podcore}/locations/?record_id=${locationId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           Accept: "application/json",
@@ -119,7 +121,7 @@ const EditLocationPopup: React.FC<EditLocationPopupProps> = ({ open, onOpenChang
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(`https://productionv36.qikpod.com/podcore/locations/${locationId}`, {
+      const response = await fetch(`${apiUrl.podcore}/locations/${locationId}`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${accessToken}`,

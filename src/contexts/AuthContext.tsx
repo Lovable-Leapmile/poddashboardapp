@@ -1,16 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "sonner";
+import { apiUrls } from "@/lib/api";
 
-const getBaseUrl = () => {
-  const stored = localStorage.getItem("api_base_url");
-  const environment = import.meta.env.VITE_ENVIRONMENT || "staging";
-  
-  if (environment === "production") {
-    return "https://productionv36.qikpod.com/podcore";
-  }
-  
-  return stored || "https://productionv36.qikpod.com/podcore";
-};
+const getBaseUrl = () => apiUrls.podcore;
 
 interface User {
   user_name: string;

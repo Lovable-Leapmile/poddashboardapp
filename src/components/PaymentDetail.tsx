@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, RefreshCw, Search, Download } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useApiUrl } from "@/hooks/useApiUrl";
 import { cn } from "@/lib/utils";
 
 interface PaymentDetailData {
@@ -28,6 +29,7 @@ interface PaymentDetailProps {
 
 const PaymentDetail: React.FC<PaymentDetailProps> = ({ paymentId, onBack }) => {
   const { accessToken } = useAuth();
+  const apiUrl = useApiUrl();
   const gridRef = useRef<AgGridReact>(null);
   const [rowData, setRowData] = useState<PaymentDetailData[]>([]);
   const [loading, setLoading] = useState(false);
@@ -53,7 +55,7 @@ const PaymentDetail: React.FC<PaymentDetailProps> = ({ paymentId, onBack }) => {
     setLoading(true);
     try {
       const response = await fetch(
-        `https://productionv36.qikpod.com/payments/payments/?record_id=${paymentId}&order_by_field=updated_at&order_by_type=DESC`,
+        `${apiUrl.payments}/payments/?record_id=${paymentId}&order_by_field=updated_at&order_by_type=DESC`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,

@@ -1,3 +1,5 @@
+import { apiUrls } from "@/lib/api";
+
 interface ApiResponse<T> {
   status: string;
   status_code: number;
@@ -233,23 +235,10 @@ interface UserReservation {
   status: string;
 }
 
-// Dynamic base URL getter
-const getBaseUrl = () => {
-  const stored = localStorage.getItem("api_base_url");
-  const environment = import.meta.env.VITE_ENVIRONMENT || "staging";
-  
-  if (environment === "production") {
-    return "https://productionv36.qikpod.com/podcore";
-  }
-  
-  return stored || "https://productionv36.qikpod.com/podcore";
-};
+// Dynamic base URL getter using centralized config
+const getBaseUrl = () => apiUrls.podcore;
 
-const getLogsBaseUrl = () => {
-  const baseUrl = getBaseUrl();
-  // Remove /podcore suffix and add trailing slash
-  return baseUrl.replace("/podcore", "/");
-};
+const getLogsBaseUrl = () => `${apiUrls.base}/`;
 
 const getAuthHeaders = (token: string) => ({
   Authorization: `Bearer ${token}`,

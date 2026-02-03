@@ -4,8 +4,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Lock, Smartphone } from 'lucide-react';
-import qikpodLogo from "@/assets/qikpod-logo.png";
+import ThemedLogo from '@/components/ThemedLogo';
+import { cn } from '@/lib/utils';
 
 const Login = () => {
   const [mobile, setMobile] = useState('');
@@ -13,6 +15,18 @@ const Login = () => {
   const [showOtpField, setShowOtpField] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { generateOTP, validateOTP, login } = useAuth();
+  const { skin } = useTheme();
+  
+  const isFlipkart = skin === "FLIPKART_UI";
+  const gradientBg = isFlipkart 
+    ? "bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700" 
+    : "bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600";
+  const accentColor = isFlipkart ? "text-blue-600" : "text-yellow-600";
+  const accentHover = isFlipkart ? "hover:text-blue-700" : "hover:text-yellow-700";
+  const buttonBg = isFlipkart ? "bg-blue-500 hover:bg-blue-600" : "bg-yellow-500 hover:bg-yellow-600";
+  const buttonText = isFlipkart ? "text-white" : "text-white";
+  const focusBorder = isFlipkart ? "focus:border-blue-500 focus:ring-blue-500" : "focus:border-yellow-500 focus:ring-yellow-500";
+  const logoBg = isFlipkart ? "bg-blue-500" : "bg-[#fddc4e]";
 
   const handleRequestOTP = async () => {
     if (!mobile || mobile.length < 10) {
@@ -45,19 +59,22 @@ const Login = () => {
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Welcome Section */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 flex-col justify-center items-center text-white p-12">
-          <div className="text-center max-w-md">
+      <div className={cn(
+        "hidden lg:flex lg:w-1/2 flex-col justify-center items-center text-white p-12",
+        gradientBg
+      )}>
+        <div className="text-center max-w-md">
           <div className="mb-8">
-            <div className="w-48 mx-auto flex items-center justify-center mb-6 p-4">
-              <img
-                src={qikpodLogo}
-                alt="QikPod Logo"
-                className="w-full h-auto object-contain"
-              />
+            <div className="w-48 mx-auto flex items-center justify-center mb-6 p-4 bg-white/10 rounded-lg">
+              <ThemedLogo className="w-full h-auto object-contain" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold mb-4">Welcome to QikPod</h1>
-          <p className="text-xl text-yellow-100">Your Smart Locker Management System</p>
+          <h1 className="text-4xl font-bold mb-4">
+            {isFlipkart ? "Welcome to Flipkart" : "Welcome to QikPod"}
+          </h1>
+          <p className={cn("text-xl", isFlipkart ? "text-blue-100" : "text-yellow-100")}>
+            {isFlipkart ? "Your Smart Locker Management System" : "Your Smart Locker Management System"}
+          </p>
         </div>
       </div>
 
@@ -67,12 +84,8 @@ const Login = () => {
           {/* Mobile/Tablet Logo */}
           <div className="w-full">
             <div className="lg:hidden text-center mb-8">
-              <div className="w-36 h-24 mx-auto bg-[#fddc4e] rounded-lg flex items-center justify-center mb-4 shadow-md p-3">
-                <img 
-                  src={qikpodLogo} 
-                  alt="QikPod Logo" 
-                  className="w-full h-full object-contain"
-                />
+              <div className={cn("w-36 h-24 mx-auto rounded-lg flex items-center justify-center mb-4 shadow-md p-3", logoBg)}>
+                <ThemedLogo className="w-full h-full object-contain" />
               </div>
             </div>
 
@@ -101,7 +114,7 @@ const Login = () => {
                         const value = e.target.value.replace(/\D/g, '');
                         setMobile(value);
                       }}
-                      className="pl-10 h-12 text-center text-lg border-gray-300 focus:border-yellow-500 focus:ring-yellow-500"
+                      className={cn("pl-10 h-12 text-center text-lg border-gray-300", focusBorder)}
                       disabled={isLoading}
                     />
                   </div>
@@ -111,7 +124,7 @@ const Login = () => {
                   <Button
                     onClick={handleRequestOTP}
                     disabled={!mobile || mobile.length < 10 || isLoading}
-                    className="w-full h-12 bg-yellow-500 hover:bg-yellow-600 text-white font-medium"
+                    className={cn("w-full h-12 font-medium", buttonBg, buttonText)}
                   >
                     {isLoading ? 'Sending OTP...' : 'Request OTP'}
                   </Button>
@@ -134,20 +147,20 @@ const Login = () => {
                             const value = e.target.value.replace(/\D/g, '');
                             setOtp(value);
                           }}
-                          className="pl-10 h-12 text-center text-lg tracking-widest border-gray-300 focus:border-yellow-500 focus:ring-yellow-500"
+                          className={cn("pl-10 h-12 text-center text-lg tracking-widest border-gray-300", focusBorder)}
                           maxLength={6}
                           disabled={isLoading}
                         />
                       </div>
                     </div>
 
-                    <Button
-                      onClick={handleLogin}
-                      disabled={!otp || otp.length < 4 || isLoading}
-                      className="w-full h-12 bg-yellow-500 hover:bg-yellow-600 text-white font-medium"
-                    >
-                      {isLoading ? 'Signing In...' : 'Sign In'}
-                    </Button>
+                      <Button
+                        onClick={handleLogin}
+                        disabled={!otp || otp.length < 4 || isLoading}
+                        className={cn("w-full h-12 font-medium", buttonBg, buttonText)}
+                      >
+                        {isLoading ? 'Signing In...' : 'Sign In'}
+                      </Button>
 
                     <Button
                       onClick={() => {
@@ -174,7 +187,7 @@ const Login = () => {
             href="https://leapmile.com/terms-and-privacy" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="text-yellow-600 hover:text-yellow-700 hover:underline mt-1 inline-block"
+            className={cn("mt-1 inline-block hover:underline", accentColor, accentHover)}
           >
             Terms and Condition & Privacy Policy / Cookies Policy
           </a>
