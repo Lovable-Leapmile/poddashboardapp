@@ -31,6 +31,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     document.documentElement.classList.remove("theme-qikpod", "theme-flipkart");
     document.documentElement.classList.add(skin === "FLIPKART_UI" ? "theme-flipkart" : "theme-qikpod");
     
+    // Update document title based on skin
+    document.title = skin === "FLIPKART_UI" ? "flipkart-dashboard" : "QikPod Dashboard";
+    
     // Update favicon based on skin
     const favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
     if (favicon) {

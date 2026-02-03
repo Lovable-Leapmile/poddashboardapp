@@ -123,8 +123,8 @@
 
 /* Flipkart theme-specific overrides */
 .theme-flipkart {
-  --theme-grid-header-bg: 217 91% 55%; /* Flipkart Blue #2874F0 */
-  --theme-grid-header-hover: 217 91% 45%; /* Darker blue for hover */
+  --theme-grid-header-bg: 217 91% 92%; /* Light Flipkart Blue */
+  --theme-grid-header-hover: 217 91% 85%; /* Slightly darker on hover */
 }
 
 .theme-flipkart .theme-sidebar {
