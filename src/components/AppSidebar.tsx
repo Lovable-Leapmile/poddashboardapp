@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronDown, ChevronRight, ChevronLeft, LogOut, HelpCircle, Activity, Settings, MapPin, Package, Calendar, Users, UserPlus, Bell, CreditCard, FileText } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -51,7 +52,15 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ setShowLogoutDialog, setShowSup
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { skin } = useTheme();
   const [expandedGroups, setExpandedGroups] = useState<string[]>(['Operations', 'Users & Network']);
+
+  const isFlipkart = skin === "FLIPKART_UI";
+  const sidebarBg = isFlipkart ? "bg-white border-r border-gray-200" : "bg-amber-100 border-r border-amber-200";
+  const itemHoverBg = isFlipkart ? "hover:bg-blue-50" : "hover:bg-amber-200";
+  const itemActiveBg = isFlipkart ? "bg-blue-100 text-blue-600" : "bg-amber-300 text-black";
+  const textColor = isFlipkart ? "text-gray-700" : "text-black";
+  const borderColor = isFlipkart ? "border-gray-200" : "border-amber-200";
 
   const isActive = (path: string) => location.pathname === path;
   
@@ -80,7 +89,8 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ setShowLogoutDialog, setShowSup
     <TooltipProvider delayDuration={100}>
       <aside 
         className={cn(
-          "bg-amber-100 h-[calc(100vh-3.5rem)] fixed top-14 left-0 flex flex-col border-r border-amber-200 overflow-hidden transition-all duration-300 z-40",
+          "h-[calc(100vh-3.5rem)] fixed top-14 left-0 flex flex-col overflow-hidden transition-all duration-300 z-40",
+          sidebarBg,
           isExpanded ? "w-56" : "w-14"
         )}
       >
@@ -90,13 +100,13 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ setShowLogoutDialog, setShowSup
           <div className={cn("flex mb-2", isExpanded ? "justify-end" : "justify-center")}>
             <button
               onClick={toggleSidebar}
-              className="p-1 rounded-md hover:bg-amber-200 transition-colors"
+              className={cn("p-1 rounded-md transition-colors", itemHoverBg)}
               title={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
             >
               {isExpanded ? (
-                <ChevronLeft className="w-4 h-4 text-black" />
+                <ChevronLeft className={cn("w-4 h-4", textColor)} />
               ) : (
-                <ChevronRight className="w-4 h-4 text-black" />
+                <ChevronRight className={cn("w-4 h-4", textColor)} />
               )}
             </button>
           </div>
@@ -110,9 +120,8 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ setShowLogoutDialog, setShowSup
                         onClick={() => toggleGroup(item.name)}
                         className={cn(
                           "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                          isGroupActive(item)
-                            ? "bg-amber-300 text-black"
-                            : "text-black hover:bg-amber-200"
+                          textColor,
+                          isGroupActive(item) ? itemActiveBg : itemHoverBg
                         )}
                       >
                         <span className="flex items-center">
@@ -132,9 +141,8 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ setShowLogoutDialog, setShowSup
                             onClick={toggleSidebar}
                             className={cn(
                               "w-full flex items-center justify-center p-2 rounded-md transition-colors",
-                              isGroupActive(item)
-                                ? "bg-amber-300 text-black"
-                                : "text-black hover:bg-amber-200"
+                              textColor,
+                              isGroupActive(item) ? itemActiveBg : itemHoverBg
                             )}
                           >
                             <item.icon className="w-5 h-5" />
@@ -153,9 +161,8 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ setShowLogoutDialog, setShowSup
                             onClick={() => handleNavClick(child.path)}
                             className={cn(
                               "w-full flex items-center px-3 py-2 text-sm rounded-md transition-colors",
-                              isActive(child.path)
-                                ? "bg-amber-300 text-black font-medium"
-                                : "text-black hover:bg-amber-200"
+                              textColor,
+                              isActive(child.path) ? itemActiveBg + " font-medium" : itemHoverBg
                             )}
                           >
                             <child.icon className="w-4 h-4 mr-3" />
@@ -171,9 +178,8 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ setShowLogoutDialog, setShowSup
                       onClick={() => handleNavClick(item.path!)}
                       className={cn(
                         "w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                        isActive(item.path!)
-                          ? "bg-amber-300 text-black"
-                          : "text-black hover:bg-amber-200"
+                        textColor,
+                        isActive(item.path!) ? itemActiveBg : itemHoverBg
                       )}
                     >
                       <item.icon className="w-4 h-4 mr-3" />
@@ -186,9 +192,8 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ setShowLogoutDialog, setShowSup
                           onClick={() => handleNavClick(item.path!)}
                           className={cn(
                             "w-full flex items-center justify-center p-2 rounded-md transition-colors",
-                            isActive(item.path!)
-                              ? "bg-amber-300 text-black"
-                              : "text-black hover:bg-amber-200"
+                            textColor,
+                            isActive(item.path!) ? itemActiveBg : itemHoverBg
                           )}
                         >
                           <item.icon className="w-5 h-5" />
@@ -205,11 +210,11 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ setShowLogoutDialog, setShowSup
           </div>
 
           {/* Support */}
-          <div className="mt-4 pt-4 border-t border-amber-200">
+          <div className={cn("mt-4 pt-4 border-t", borderColor)}>
             {isExpanded ? (
               <button
                 onClick={() => setShowSupportPopup(true)}
-                className="w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-black hover:bg-amber-200 transition-colors"
+                className={cn("w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors", textColor, itemHoverBg)}
               >
                 <HelpCircle className="w-4 h-4 mr-3" />
                 Support
@@ -219,7 +224,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ setShowLogoutDialog, setShowSup
                 <TooltipTrigger asChild>
                   <button
                     onClick={() => setShowSupportPopup(true)}
-                    className="w-full flex items-center justify-center p-2 rounded-md text-black hover:bg-amber-200 transition-colors"
+                    className={cn("w-full flex items-center justify-center p-2 rounded-md transition-colors", textColor, itemHoverBg)}
                   >
                     <HelpCircle className="w-5 h-5" />
                   </button>
@@ -233,17 +238,17 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ setShowLogoutDialog, setShowSup
         </nav>
 
         {/* User & Logout */}
-        <div className="p-2 border-t border-amber-200">
+        <div className={cn("p-2 border-t", borderColor)}>
           {isExpanded ? (
             <>
               {user && (
-                <div className="text-xs text-black font-medium mb-2 px-2">
+                <div className={cn("text-xs font-medium mb-2 px-2", textColor)}>
                   Welcome, {user.user_name}
                 </div>
               )}
               <button
                 onClick={() => setShowLogoutDialog(true)}
-                className="w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-black hover:bg-amber-200 transition-colors"
+                className={cn("w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors", textColor, itemHoverBg)}
               >
                 <LogOut className="w-4 h-4 mr-3" />
                 Logout
@@ -254,7 +259,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ setShowLogoutDialog, setShowSup
               <TooltipTrigger asChild>
                 <button
                   onClick={() => setShowLogoutDialog(true)}
-                  className="w-full flex items-center justify-center p-2 rounded-md text-black hover:bg-amber-200 transition-colors"
+                  className={cn("w-full flex items-center justify-center p-2 rounded-md transition-colors", textColor, itemHoverBg)}
                 >
                   <LogOut className="w-5 h-5" />
                 </button>

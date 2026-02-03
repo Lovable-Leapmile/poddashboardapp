@@ -34,6 +34,27 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+
+    /* Theme-specific variables with defaults for QikPod */
+    --theme-primary: 49 100% 64%;
+    --theme-primary-foreground: 240 10% 3.9%;
+    --theme-accent: 49 100% 64%;
+    --theme-accent-foreground: 240 10% 3.9%;
+    --theme-header-bg: 49 100% 64%;
+    --theme-header-text: 0 0% 0%;
+    --theme-sidebar-bg: 49 100% 64%;
+    --theme-sidebar-text: 0 0% 0%;
+    --theme-sidebar-accent: 49 100% 74%;
+    --theme-button-primary-bg: 49 100% 64%;
+    --theme-button-primary-text: 0 0% 0%;
+    --theme-button-primary-hover: 49 100% 54%;
+    --theme-success: 142 71% 45%;
+    --theme-warning: 38 92% 50%;
+    --theme-error: 0 84% 60%;
+    --theme-border: 240 5.9% 90%;
+    --theme-muted-text: 240 3.8% 46.1%;
+    --theme-text-primary: 240 10% 3.9%;
+    --theme-bg-light: 0 0% 98%;
   }
 
   .dark {
@@ -71,4 +92,52 @@
     @apply bg-background text-foreground;
     font-family: "Inter", sans-serif;
   }
+}
+
+/* Theme-aware utility classes */
+.theme-header {
+  background-color: hsl(var(--theme-header-bg));
+  color: hsl(var(--theme-header-text));
+}
+
+.theme-sidebar {
+  background-color: hsl(var(--theme-sidebar-bg));
+  color: hsl(var(--theme-sidebar-text));
+}
+
+.theme-sidebar-accent {
+  background-color: hsl(var(--theme-sidebar-accent));
+}
+
+.theme-button-primary {
+  background-color: hsl(var(--theme-button-primary-bg));
+  color: hsl(var(--theme-button-primary-text));
+}
+
+.theme-button-primary:hover {
+  background-color: hsl(var(--theme-button-primary-hover));
+}
+
+/* Flipkart theme-specific overrides */
+.theme-flipkart .theme-sidebar {
+  background-color: hsl(0 0% 100%);
+  border-right: 1px solid hsl(var(--theme-border));
+}
+
+.theme-flipkart .theme-sidebar-item:hover {
+  background-color: hsl(217 91% 95%);
+}
+
+.theme-flipkart .theme-sidebar-item.active {
+  background-color: hsl(217 91% 90%);
+  color: hsl(217 91% 55%);
+}
+
+/* QikPod theme-specific overrides */
+.theme-qikpod .theme-sidebar-item:hover {
+  background-color: hsl(49 100% 74%);
+}
+
+.theme-qikpod .theme-sidebar-item.active {
+  background-color: hsl(49 100% 70%);
 }

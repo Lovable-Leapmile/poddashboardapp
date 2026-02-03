@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CreditCard, DollarSign, Hash, Package } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useApiUrl } from "@/hooks/useApiUrl";
 import { toast } from "sonner";
 
 interface CreatePaymentPopupProps {
@@ -46,6 +47,7 @@ interface PaymentResponse {
 
 const CreatePaymentPopup: React.FC<CreatePaymentPopupProps> = ({ isOpen, onClose, onSuccess }) => {
   const { accessToken } = useAuth();
+  const apiUrl = useApiUrl();
   const [formData, setFormData] = useState({
     clientReferenceId: "",
     awbNo: "",
@@ -75,7 +77,7 @@ const CreatePaymentPopup: React.FC<CreatePaymentPopupProps> = ({ isOpen, onClose
   const createPayment = async (): Promise<string | null> => {
     try {
       const response = await fetch(
-        `https://productionv36.qikpod.com/payments/payments/create_payment/?payment_client_awbno=${encodeURIComponent(formData.awbNo)}&amount=${encodeURIComponent(formData.amount)}&payment_client_reference_id=${encodeURIComponent(formData.clientReferenceId)}&payment_vendor=${encodeURIComponent(formData.paymentMethod)}`,
+        `${apiUrl.payments}/payments/create_payment/?payment_client_awbno=${encodeURIComponent(formData.awbNo)}&amount=${encodeURIComponent(formData.amount)}&payment_client_reference_id=${encodeURIComponent(formData.clientReferenceId)}&payment_vendor=${encodeURIComponent(formData.paymentMethod)}`,
         {
           method: "POST",
           headers: {

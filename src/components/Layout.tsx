@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import qikpodLogo from "@/assets/qikpod-logo.png";
+import ThemedLogo from "@/components/ThemedLogo";
+import { useTheme } from "@/contexts/ThemeContext";
 import {
   Dialog,
   DialogContent,
@@ -24,6 +25,7 @@ import AppSidebar from "./AppSidebar";
 import MobileHeader from "./MobileHeader";
 import MobileSidebar from "./MobileSidebar";
 import SupportPopup from "./SupportPopup";
+import { cn } from "@/lib/utils";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -33,6 +35,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children, title, breadcrumb }) => {
   const { logout, user } = useAuth();
+  const { skin } = useTheme();
   const navigate = useNavigate();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [showSupportPopup, setShowSupportPopup] = useState(false);
@@ -57,24 +60,29 @@ const Layout: React.FC<LayoutProps> = ({ children, title, breadcrumb }) => {
     <div className="min-h-screen bg-gray-50 w-full">
       {/* Desktop & Tablet Layout - Header on top, Sidebar below */}
       <div className="hidden md:flex flex-col min-h-screen">
-        {/* Fixed Desktop Header with Logo - matching sidebar color */}
-        <header className="h-14 bg-[#FDDC4E] border-yellow-300 border-b flex items-center justify-between px-6 fixed top-0 left-0 right-0 z-50">
+        {/* Fixed Desktop Header with Logo - using theme classes */}
+        <header className={cn(
+          "h-14 border-b flex items-center justify-between px-6 fixed top-0 left-0 right-0 z-50 theme-header",
+          skin === "FLIPKART_UI" ? "border-blue-400" : "border-yellow-300"
+        )}>
           <div className="flex items-center">
             <div className="cursor-pointer" onClick={() => navigate("/dashboard")}>
-              <img
-                src={qikpodLogo}
-                alt="QikPod Logo"
-                className="h-6 w-auto"
-              />
+              <ThemedLogo className="h-6 w-auto" />
             </div>
           </div>
           {/* Welcome message and profile on the right */}
           <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-black">Welcome, {user?.user_name || "User"}</span>
+            <span className={cn(
+              "text-sm font-medium",
+              skin === "FLIPKART_UI" ? "text-white" : "text-black"
+            )}>Welcome, {user?.user_name || "User"}</span>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="p-2 rounded-full hover:bg-yellow-400 transition-colors">
-                  <User className="w-5 h-5 text-black" />
+                <button className={cn(
+                  "p-2 rounded-full transition-colors",
+                  skin === "FLIPKART_UI" ? "hover:bg-blue-500" : "hover:bg-yellow-400"
+                )}>
+                  <User className={cn("w-5 h-5", skin === "FLIPKART_UI" ? "text-white" : "text-black")} />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
@@ -143,7 +151,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, breadcrumb }) => {
             <Button variant="outline" onClick={() => setShowLogoutDialog(false)}>
               Cancel
             </Button>
-            <Button onClick={handleLogout} className="bg-[#FDDC4E] hover:bg-yellow-400 text-black">
+            <Button onClick={handleLogout} className="theme-button-primary">
               Logout
             </Button>
           </DialogFooter>
