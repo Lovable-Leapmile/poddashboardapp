@@ -1,7 +1,7 @@
 import React from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 import qikpodLogo from "@/assets/qikpod-logo.png";
-import flipkartLogo from "@/assets/flipkart-logo.svg";
+import flipkartLogo from "@/assets/flipkart-logo.png";
 
 interface ThemedLogoProps {
   className?: string;
