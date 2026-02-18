@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import DashboardPage from "./pages/Dashboard";
 import PodsPage from "./pages/Pods";
+import OnboardPodPage from "./pages/OnboardPod";
 import LocationsPage from "./pages/Locations";
 import ReservationsPage from "./pages/Reservations";
 import UsersPage from "./pages/Users";
@@ -36,6 +37,7 @@ const App = () => (
               <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
               <Route path="/locations" element={<ProtectedRoute><LocationsPage /></ProtectedRoute>} />
               <Route path="/pods" element={<ProtectedRoute><PodsPage /></ProtectedRoute>} />
+              <Route path="/pods/onboard" element={<ProtectedRoute><OnboardPodPage /></ProtectedRoute>} />
               <Route path="/reservations" element={<ProtectedRoute><ReservationsPage /></ProtectedRoute>} />
               <Route path="/users" element={<ProtectedRoute><UsersPage /></ProtectedRoute>} />
               <Route path="/partner" element={<ProtectedRoute><PartnerPage /></ProtectedRoute>} />
