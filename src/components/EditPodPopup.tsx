@@ -61,7 +61,7 @@ const EditPodPopup: React.FC<EditPodPopupProps> = ({ open, onOpenChange, podData
   }, [podData]);
 
   const handleSubmit = async () => {
-    if (!accessToken) return;
+    if (!accessToken || !formData.pod_name.trim() || formData.pod_name.length > 100) return;
 
     setLoading(true);
     try {

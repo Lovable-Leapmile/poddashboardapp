@@ -51,7 +51,7 @@ const AddLocationPopup: React.FC<AddLocationPopupProps> = ({
       return;
     }
 
-    if (!formData.location_name || !formData.location_address) {
+    if (!formData.location_name.trim() || !formData.location_address.trim() || formData.location_name.length > 200 || formData.location_address.length > 500) {
       toast({
         title: "Error",
         description: "Location name and address are required",
@@ -138,8 +138,9 @@ const AddLocationPopup: React.FC<AddLocationPopupProps> = ({
             <Input
               id="location_pincode"
               value={formData.location_pincode}
-              onChange={(e) => handleInputChange("location_pincode", e.target.value)}
+              onChange={(e) => handleInputChange("location_pincode", e.target.value.replace(/[^0-9]/g, "").slice(0, 6))}
               placeholder="e.g., 560093"
+              maxLength={6}
             />
           </div>
 
