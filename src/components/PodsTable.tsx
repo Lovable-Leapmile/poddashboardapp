@@ -7,7 +7,8 @@ import "@/styles/ag-grid.css";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Package, Eye, RefreshCw, Download, FileSpreadsheet, FileText, ArrowLeft, Plus } from "lucide-react";
+import { Package, Eye, RefreshCw, Download, FileSpreadsheet, FileText, ArrowLeft, Plus, Cpu } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import AddPodPopup from "./AddPodPopup";
 import TableFilters, { FilterConfig } from "@/components/filters/TableFilters";
 import { useTableFilters } from "@/hooks/useTableFilters";
@@ -32,6 +33,7 @@ interface PodsTableProps {
 
 const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }) => {
   const { accessToken } = useAuth();
+  const navigate = useNavigate();
   const gridRef = useRef<AgGridReact>(null);
   const [pods, setPods] = useState<Pod[]>([]);
   const [loading, setLoading] = useState(false);
@@ -255,6 +257,15 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
               >
                 <Plus className="w-4 h-4 sm:mr-1" />
                 <span className="hidden sm:inline">Add Pod</span>
+              </Button>
+
+              <Button
+                onClick={() => navigate("/pods/onboard")}
+                className="bg-[#FDDC4E] hover:bg-yellow-400 text-black flex items-center h-8 px-2 sm:px-3"
+                size="sm"
+              >
+                <Cpu className="w-4 h-4 sm:mr-1" />
+                <span className="hidden sm:inline">Onboard Pod</span>
               </Button>
 
               <DropdownMenu>
