@@ -46,7 +46,7 @@ const EditUserPopup: React.FC<EditUserPopupProps> = ({ open, onOpenChange, user,
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!accessToken) return;
+    if (!accessToken || !formData.user_name.trim() || formData.user_name.length > 100) return;
 
     setLoading(true);
     try {

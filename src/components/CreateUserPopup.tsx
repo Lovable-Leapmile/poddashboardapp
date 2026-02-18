@@ -34,20 +34,20 @@ const CreateUserPopup: React.FC<CreateUserPopupProps> = ({ open, onOpenChange, l
   };
 
   const handleNameChange = (value: string) => {
-    // Allow only alphabets and spaces
-    const alphabetOnly = value.replace(/[^a-zA-Z\s]/g, "");
+    // Allow only alphabets and spaces, max 100 chars
+    const alphabetOnly = value.replace(/[^a-zA-Z\s]/g, "").slice(0, 100);
     handleInputChange("name", alphabetOnly);
   };
 
   const handlePhoneChange = (value: string) => {
-    // Allow only numerics
-    const numericOnly = value.replace(/[^0-9]/g, "");
+    // Allow only numerics, max 10 digits
+    const numericOnly = value.replace(/[^0-9]/g, "").slice(0, 10);
     handleInputChange("phone", numericOnly);
   };
 
   const handleFlatNoChange = (value: string) => {
-    // Allow only numerics
-    const numericOnly = value.replace(/[^0-9]/g, "");
+    // Allow only numerics, max 10 chars
+    const numericOnly = value.replace(/[^0-9]/g, "").slice(0, 10);
     handleInputChange("flatNo", numericOnly);
   };
 
@@ -72,7 +72,7 @@ const CreateUserPopup: React.FC<CreateUserPopupProps> = ({ open, onOpenChange, l
   };
 
   const handleSubmit = async () => {
-    if (!accessToken || !formData.name || !formData.userType || !formData.phone) {
+    if (!accessToken || !formData.name.trim() || !formData.userType || !formData.phone || !/^\d{10}$/.test(formData.phone)) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",

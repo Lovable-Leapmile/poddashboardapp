@@ -94,11 +94,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const generateOTP = async (mobile: string): Promise<boolean> => {
     try {
       const baseUrl = getBaseUrl();
-      const response = await fetch(`${baseUrl}/otp/generate_otp/?user_phone=${mobile}`, {
+      const otpToken = import.meta.env.VITE_OTP_AUTH_TOKEN;
+      if (!otpToken) {
+        toast.error("OTP authentication not configured");
+        return false;
+      }
+      const response = await fetch(`${baseUrl}/otp/generate_otp/?user_phone=${encodeURIComponent(mobile)}`, {
         method: "GET",
         headers: {
-          Authorization:
-            "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhY2wiOiJhZG1pbiIsImV4cCI6MTkwMDczNDA0MH0.pHhmwwEsMIO-5nyxOvw4G2ntQ7-H2A6hyFdQSci8OCY",
+          Authorization: `Bearer ${otpToken}`,
           Accept: "application/json",
         },
       });
@@ -122,13 +126,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const validateOTP = async (mobile: string, otp: string): Promise<{ success: boolean; data?: any }> => {
     try {
       const baseUrl = getBaseUrl();
+      const otpToken = import.meta.env.VITE_OTP_AUTH_TOKEN;
+      if (!otpToken) {
+        toast.error("OTP authentication not configured");
+        return { success: false };
+      }
       const response = await fetch(
-        `${baseUrl}/otp/validate_otp/?user_phone=${mobile}&otp_text=${otp}`,
+        `${baseUrl}/otp/validate_otp/?user_phone=${encodeURIComponent(mobile)}&otp_text=${encodeURIComponent(otp)}`,
         {
           method: "GET",
           headers: {
-            Authorization:
-              "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhY2wiOiJhZG1pbiIsImV4cCI6MTkwMDczNDA0MH0.pHhmwwEsMIO-5nyxOvw4G2ntQ7-H2A6hyFdQSci8OCY",
+            Authorization: `Bearer ${otpToken}`,
             Accept: "application/json",
           },
         },

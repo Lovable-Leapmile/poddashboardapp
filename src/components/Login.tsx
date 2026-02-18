@@ -29,7 +29,7 @@ const Login = () => {
   const logoBg = isFlipkart ? "bg-blue-500" : "bg-[#fddc4e]";
 
   const handleRequestOTP = async () => {
-    if (!mobile || mobile.length < 10) {
+    if (!mobile || mobile.length !== 10 || !/^\d{10}$/.test(mobile)) {
       return;
     }
 
@@ -42,7 +42,7 @@ const Login = () => {
   };
 
   const handleLogin = async () => {
-    if (!otp || otp.length < 4) {
+    if (!otp || !/^\d{4,6}$/.test(otp)) {
       return;
     }
 
@@ -111,9 +111,10 @@ const Login = () => {
                       placeholder="Enter mobile number"
                       value={mobile}
                       onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, '');
+                        const value = e.target.value.replace(/\D/g, '').slice(0, 10);
                         setMobile(value);
                       }}
+                      maxLength={10}
                       className={cn("pl-10 h-12 text-center text-lg border-gray-300", focusBorder)}
                       disabled={isLoading}
                     />
