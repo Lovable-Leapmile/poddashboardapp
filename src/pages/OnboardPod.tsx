@@ -61,8 +61,12 @@ const OnboardPodPage: React.FC = () => {
 
     setSubmitting(true);
     try {
-      const response = await fetch(`${apiUrls.podcore}/onboard/`, {
-        method: "POST",
+      const isEdit = editIndex !== null;
+      const url = isEdit
+        ? `${apiUrls.podcore}/onboard/${encodeURIComponent(macId.trim())}`
+        : `${apiUrls.podcore}/onboard/`;
+      const response = await fetch(url, {
+        method: isEdit ? "PATCH" : "POST",
         headers: {
           "accept": "application/json",
           "Authorization": `Bearer ${accessToken}`,
@@ -78,8 +82,10 @@ const OnboardPodPage: React.FC = () => {
 
       const data = await response.json();
 
-      if (response.ok) {
-        toast.success("Pod onboarded successfully");
+      if (data?.error) {
+        toast.error(data.error);
+      } else if (response.ok) {
+        toast.success(isEdit ? "Pod updated successfully" : "Pod onboarded successfully");
         const podEntry: OnboardedPod = {
           mac_id: macId.trim(),
           pod_id: podId.trim(),
@@ -88,7 +94,7 @@ const OnboardPodPage: React.FC = () => {
           ...data,
         };
 
-        if (editIndex !== null) {
+        if (isEdit) {
           setOnboardedPods((prev) => {
             const updated = [...prev];
             updated[editIndex] = podEntry;
