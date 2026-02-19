@@ -6,12 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Send, Edit2, Trash2 } from "lucide-react";
+import { ArrowLeft, Send, Edit2, Trash2, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { apiUrls } from "@/lib/api";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface OnboardedPod {
+  id?: number | string;
   mac_id: string;
   pod_id: string;
   wifi_ssid: string;
@@ -22,6 +24,7 @@ interface OnboardedPod {
 const OnboardPodPage: React.FC = () => {
   const { accessToken } = useAuth();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const [macId, setMacId] = useState("");
   const [podId, setPodId] = useState("");
@@ -39,6 +42,10 @@ const OnboardPodPage: React.FC = () => {
     setEditIndex(null);
   };
 
+  const handleRemoveRow = (index: number) => {
+    setOnboardedPods((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -47,7 +54,6 @@ const OnboardPodPage: React.FC = () => {
       return;
     }
 
-    // Validate mac_id format (XX:XX:XX:XX:XX pattern)
     const macRegex = /^([0-9A-Fa-f]{2}:){4}[0-9A-Fa-f]{2}$/;
     if (!macRegex.test(macId.trim())) {
       toast.error("Invalid MAC ID format. Use format like AA:BB:CC:DD:EE");
@@ -81,14 +87,18 @@ const OnboardPodPage: React.FC = () => {
       });
 
       const data = await response.json();
+      console.log("Onboard API response:", JSON.stringify(data));
 
       if (data?.error) {
         toast.error(data.error);
       } else if (response.ok) {
         toast.success(isEdit ? "Pod updated successfully" : "Pod onboarded successfully");
+
+        // Extract id from response - check common response shapes
+        const responseId = data?.id ?? data?.response?.id ?? data?.data?.id ?? data?.result?.id;
+
         const podEntry: OnboardedPod = {
-          ...data,
-          id: data.id,
+          id: responseId,
           mac_id: macId.trim(),
           pod_id: podId.trim(),
           wifi_ssid: wifiSsid.trim(),
@@ -250,7 +260,7 @@ const OnboardPodPage: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Results Table */}
+        {/* Results */}
         {onboardedPods.length > 0 && (
           <Card className="bg-white shadow-sm rounded-xl border-gray-200">
             <CardHeader className="pb-4">
@@ -259,51 +269,117 @@ const OnboardPodPage: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>MAC ID</TableHead>
-                    <TableHead>Pod ID</TableHead>
-                    <TableHead>Wifi SSID</TableHead>
-                    <TableHead>Wifi Password</TableHead>
-                    <TableHead>Action</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              {isMobile ? (
+                <div className="flex flex-col gap-3">
                   {onboardedPods.map((pod, index) => (
-                    <TableRow key={index}>
-                      <TableCell className="font-medium">{pod.id ?? "-"}</TableCell>
-                      <TableCell>{pod.mac_id}</TableCell>
-                      <TableCell>{pod.pod_id}</TableCell>
-                      <TableCell>{pod.wifi_ssid}</TableCell>
-                      <TableCell>{pod.wifi_password}</TableCell>
-                      <TableCell>
-                        <div className="flex gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEdit(index)}
-                            className="h-8 w-8 p-0 transition-colors bg-gray-100 text-gray-600 hover:text-gray-800 hover:bg-[#FDDC4E] hover:text-black"
-                            title="Edit"
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(index)}
-                            className="h-8 w-8 p-0 transition-colors bg-gray-100 text-red-500 hover:bg-red-100 hover:text-red-700"
-                            title="Delete"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                    <div key={index} className="relative border border-gray-200 rounded-lg p-4 bg-gray-50">
+                      {/* Close (remove row) button */}
+                      <button
+                        onClick={() => handleRemoveRow(index)}
+                        className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 transition-colors"
+                        title="Remove row"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                      <div className="space-y-2 text-sm pr-6">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground font-medium">ID</span>
+                          <span className="font-semibold">{pod.id ?? "-"}</span>
                         </div>
-                      </TableCell>
-                    </TableRow>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground font-medium">MAC ID</span>
+                          <span>{pod.mac_id}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground font-medium">Pod ID</span>
+                          <span>{pod.pod_id}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground font-medium">Wifi SSID</span>
+                          <span>{pod.wifi_ssid}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground font-medium">Wifi Password</span>
+                          <span>{pod.wifi_password}</span>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 mt-3 pt-3 border-t border-gray-200">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEdit(index)}
+                          className="h-8 flex-1 transition-colors bg-gray-100 text-gray-600 hover:bg-[#FDDC4E] hover:text-black"
+                        >
+                          <Edit2 className="h-4 w-4 mr-1" /> Edit
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(index)}
+                          className="h-8 flex-1 transition-colors bg-gray-100 text-red-500 hover:bg-red-100 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4 mr-1" /> Delete
+                        </Button>
+                      </div>
+                    </div>
                   ))}
-                </TableBody>
-              </Table>
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ID</TableHead>
+                      <TableHead>MAC ID</TableHead>
+                      <TableHead>Pod ID</TableHead>
+                      <TableHead>Wifi SSID</TableHead>
+                      <TableHead>Wifi Password</TableHead>
+                      <TableHead>Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {onboardedPods.map((pod, index) => (
+                      <TableRow key={index}>
+                        <TableCell className="font-medium">{pod.id ?? "-"}</TableCell>
+                        <TableCell>{pod.mac_id}</TableCell>
+                        <TableCell>{pod.pod_id}</TableCell>
+                        <TableCell>{pod.wifi_ssid}</TableCell>
+                        <TableCell>{pod.wifi_password}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEdit(index)}
+                              className="h-8 w-8 p-0 transition-colors bg-gray-100 text-gray-600 hover:text-gray-800 hover:bg-[#FDDC4E] hover:text-black"
+                              title="Edit"
+                            >
+                              <Edit2 className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(index)}
+                              className="h-8 w-8 p-0 transition-colors bg-gray-100 text-red-500 hover:bg-red-100 hover:text-red-700"
+                              title="Delete"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleRemoveRow(index)}
+                              className="h-8 w-8 p-0 transition-colors bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-700"
+                              title="Remove row"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
             </CardContent>
           </Card>
         )}
