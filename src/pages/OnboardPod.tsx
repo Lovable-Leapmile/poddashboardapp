@@ -292,52 +292,54 @@ const OnboardPodPage: React.FC = () => {
                 Onboarded Pods
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>MAC ID</TableHead>
-                    <TableHead>Pod ID</TableHead>
-                    <TableHead>Wifi SSID</TableHead>
-                    <TableHead>Wifi Password</TableHead>
-                    <TableHead>Action</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {onboardedPods.map((pod, index) => (
-                    <TableRow key={index}>
-                      <TableCell className="font-medium">{pod.id ?? "-"}</TableCell>
-                      <TableCell>{pod.mac_id}</TableCell>
-                      <TableCell>{pod.pod_id}</TableCell>
-                      <TableCell>{pod.wifi_ssid}</TableCell>
-                      <TableCell>{pod.wifi_password}</TableCell>
-                      <TableCell>
-                        <div className="flex gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEdit(index)}
-                            className="h-8 w-8 p-0 transition-colors bg-gray-100 text-gray-600 hover:text-gray-800 hover:bg-[#FDDC4E] hover:text-black"
-                            title="Edit"
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(index)}
-                            className="h-8 w-8 p-0 transition-colors bg-gray-100 text-red-500 hover:bg-red-100 hover:text-red-700"
-                            title="Delete"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
+            <CardContent className="p-0 sm:p-6">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="whitespace-nowrap">ID</TableHead>
+                      <TableHead className="whitespace-nowrap">MAC ID</TableHead>
+                      <TableHead className="whitespace-nowrap">Pod ID</TableHead>
+                      <TableHead className="whitespace-nowrap">Wifi SSID</TableHead>
+                      <TableHead className="whitespace-nowrap">Wifi Password</TableHead>
+                      <TableHead className="whitespace-nowrap">Action</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {onboardedPods.map((pod, index) => (
+                      <TableRow key={pod.id ?? index}>
+                        <TableCell className="font-medium whitespace-nowrap">{pod.id ?? "-"}</TableCell>
+                        <TableCell className="whitespace-nowrap">{pod.mac_id}</TableCell>
+                        <TableCell className="whitespace-nowrap">{pod.pod_id}</TableCell>
+                        <TableCell className="whitespace-nowrap">{pod.wifi_ssid}</TableCell>
+                        <TableCell className="whitespace-nowrap">{pod.wifi_password}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEdit(index)}
+                              className="h-8 w-8 p-0 transition-colors bg-gray-100 text-gray-600 hover:text-gray-800 hover:bg-[#FDDC4E] hover:text-black"
+                              title="Edit"
+                            >
+                              <Edit2 className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(index)}
+                              className="h-8 w-8 p-0 transition-colors bg-gray-100 text-red-500 hover:bg-red-100 hover:text-red-700"
+                              title="Delete"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
         )}
