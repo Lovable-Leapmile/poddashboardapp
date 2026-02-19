@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Send, Edit2 } from "lucide-react";
+import { ArrowLeft, Send, Edit2, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { apiUrls } from "@/lib/api";
 import { toast } from "sonner";
@@ -125,6 +125,34 @@ const OnboardPodPage: React.FC = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleDelete = async (index: number) => {
+    const pod = onboardedPods[index];
+    const podApiId = pod.id;
+    if (!podApiId) {
+      toast.error("No ID available for deletion");
+      return;
+    }
+    try {
+      const response = await fetch(`${apiUrls.podcore}/onboard/${encodeURIComponent(podApiId)}`, {
+        method: "DELETE",
+        headers: {
+          "accept": "application/json",
+          "Authorization": `Bearer ${accessToken}`,
+        },
+      });
+      if (response.ok) {
+        toast.success("Pod deleted successfully");
+        setOnboardedPods((prev) => prev.filter((_, i) => i !== index));
+      } else {
+        const data = await response.json().catch(() => ({}));
+        toast.error(data?.error || data?.message || "Failed to delete pod");
+      }
+    } catch (error) {
+      console.error("Error deleting pod:", error);
+      toast.error("Network error while deleting pod");
+    }
+  };
+
   if (!accessToken) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -233,7 +261,7 @@ const OnboardPodPage: React.FC = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>#</TableHead>
+                    <TableHead>ID</TableHead>
                     <TableHead>MAC ID</TableHead>
                     <TableHead>Pod ID</TableHead>
                     <TableHead>Wifi SSID</TableHead>
@@ -244,21 +272,32 @@ const OnboardPodPage: React.FC = () => {
                 <TableBody>
                   {onboardedPods.map((pod, index) => (
                     <TableRow key={index}>
-                      <TableCell className="font-medium">{index + 1}</TableCell>
+                      <TableCell className="font-medium">{pod.id ?? "-"}</TableCell>
                       <TableCell>{pod.mac_id}</TableCell>
                       <TableCell>{pod.pod_id}</TableCell>
                       <TableCell>{pod.wifi_ssid}</TableCell>
                       <TableCell>{pod.wifi_password}</TableCell>
                       <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEdit(index)}
-                          className="h-8 w-8 p-0 transition-colors bg-gray-100 text-gray-600 hover:text-gray-800 hover:bg-[#FDDC4E] hover:text-black"
-                          title="Edit"
-                        >
-                          <Edit2 className="h-4 w-4" />
-                        </Button>
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEdit(index)}
+                            className="h-8 w-8 p-0 transition-colors bg-gray-100 text-gray-600 hover:text-gray-800 hover:bg-[#FDDC4E] hover:text-black"
+                            title="Edit"
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDelete(index)}
+                            className="h-8 w-8 p-0 transition-colors bg-gray-100 text-red-500 hover:bg-red-100 hover:text-red-700"
+                            title="Delete"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
