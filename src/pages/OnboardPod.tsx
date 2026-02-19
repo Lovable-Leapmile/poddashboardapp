@@ -87,11 +87,12 @@ const OnboardPodPage: React.FC = () => {
       } else if (response.ok) {
         toast.success(isEdit ? "Pod updated successfully" : "Pod onboarded successfully");
         const podEntry: OnboardedPod = {
+          ...data,
+          id: data.id,
           mac_id: macId.trim(),
           pod_id: podId.trim(),
           wifi_ssid: wifiSsid.trim(),
           wifi_password: wifiPassword.trim(),
-          ...data,
         };
 
         if (isEdit) {
