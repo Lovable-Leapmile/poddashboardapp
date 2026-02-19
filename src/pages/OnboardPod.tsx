@@ -86,22 +86,24 @@ const OnboardPodPage: React.FC = () => {
         toast.error(data.error);
       } else if (response.ok) {
         toast.success(isEdit ? "Pod updated successfully" : "Pod onboarded successfully");
-        const podEntry: OnboardedPod = {
-          mac_id: macId.trim(),
-          pod_id: podId.trim(),
-          wifi_ssid: wifiSsid.trim(),
-          wifi_password: wifiPassword.trim(),
-          ...data,
-        };
 
-        if (isEdit) {
+        if (!isEdit && data?.mac_id && data?.pod_key) {
+          // Fetch the pod details using GET API with mac_id and pod_key from POST response
+          await fetchOnboardedPod(data.mac_id, data.pod_key);
+        } else if (isEdit) {
+          // For edit, update the existing entry in the table
+          const podEntry: OnboardedPod = {
+            mac_id: macId.trim(),
+            pod_id: podId.trim(),
+            wifi_ssid: wifiSsid.trim(),
+            wifi_password: wifiPassword.trim(),
+            ...data,
+          };
           setOnboardedPods((prev) => {
             const updated = [...prev];
             updated[editIndex] = podEntry;
             return updated;
           });
-        } else {
-          setOnboardedPods((prev) => [...prev, podEntry]);
         }
         resetForm();
       } else {
@@ -112,6 +114,39 @@ const OnboardPodPage: React.FC = () => {
       toast.error("Network error while onboarding pod");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const fetchOnboardedPod = async (mac_id: string, pod_key: string) => {
+    try {
+      const response = await fetch(
+        `${apiUrls.podcore}/onboard/?mac_id=${encodeURIComponent(mac_id)}&pod_key=${encodeURIComponent(pod_key)}`,
+        {
+          method: "GET",
+          headers: {
+            "accept": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+      if (response.ok) {
+        // Extract pod from response - handle various response structures
+        let pod: OnboardedPod | null = null;
+        if (Array.isArray(data) && data.length > 0) {
+          pod = data[0];
+        } else if (data?.data && Array.isArray(data.data) && data.data.length > 0) {
+          pod = data.data[0];
+        } else if (data?.results && Array.isArray(data.results) && data.results.length > 0) {
+          pod = data.results[0];
+        } else if (data?.id) {
+          pod = data;
+        }
+        if (pod) {
+          setOnboardedPods((prev) => [...prev, pod!]);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching onboarded pod:", error);
     }
   };
 
