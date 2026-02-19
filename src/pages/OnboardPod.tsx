@@ -283,10 +283,6 @@ const OnboardPodPage: React.FC = () => {
                       </button>
                       <div className="space-y-2 text-sm pr-6">
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground font-medium">ID</span>
-                          <span className="font-semibold">{pod.id ?? "-"}</span>
-                        </div>
-                        <div className="flex justify-between">
                           <span className="text-muted-foreground font-medium">MAC ID</span>
                           <span>{pod.mac_id}</span>
                         </div>
@@ -312,14 +308,6 @@ const OnboardPodPage: React.FC = () => {
                         >
                           <Edit2 className="h-4 w-4 mr-1" /> Edit
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(index)}
-                          className="h-8 flex-1 transition-colors bg-gray-100 text-red-500 hover:bg-red-100 hover:text-red-700"
-                        >
-                          <Trash2 className="h-4 w-4 mr-1" /> Delete
-                        </Button>
                       </div>
                     </div>
                   ))}
@@ -328,7 +316,6 @@ const OnboardPodPage: React.FC = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>ID</TableHead>
                       <TableHead>MAC ID</TableHead>
                       <TableHead>Pod ID</TableHead>
                       <TableHead>Wifi SSID</TableHead>
@@ -339,7 +326,6 @@ const OnboardPodPage: React.FC = () => {
                   <TableBody>
                     {onboardedPods.map((pod, index) => (
                       <TableRow key={index}>
-                        <TableCell className="font-medium">{pod.id ?? "-"}</TableCell>
                         <TableCell>{pod.mac_id}</TableCell>
                         <TableCell>{pod.pod_id}</TableCell>
                         <TableCell>{pod.wifi_ssid}</TableCell>
@@ -354,15 +340,6 @@ const OnboardPodPage: React.FC = () => {
                               title="Edit"
                             >
                               <Edit2 className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDelete(index)}
-                              className="h-8 w-8 p-0 transition-colors bg-gray-100 text-red-500 hover:bg-red-100 hover:text-red-700"
-                              title="Delete"
-                            >
-                              <Trash2 className="h-4 w-4" />
                             </Button>
                             <Button
                               variant="ghost"
