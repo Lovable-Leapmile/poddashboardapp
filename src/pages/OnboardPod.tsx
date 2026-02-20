@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Send, Edit2, Trash2, X } from "lucide-react";
+import { ArrowLeft, Send, Search, Edit2, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { apiUrls } from "@/lib/api";
 import { toast } from "sonner";
@@ -31,8 +31,13 @@ const OnboardPodPage: React.FC = () => {
   const [wifiSsid, setWifiSsid] = useState("");
   const [wifiPassword, setWifiPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [onboardedPods, setOnboardedPods] = useState<OnboardedPod[]>([]);
   const [editIndex, setEditIndex] = useState<number | null>(null);
+
+  // Search state
+  const [searchPodId, setSearchPodId] = useState("");
+  const [searching, setSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<OnboardedPod[]>([]);
+  const [hasSearched, setHasSearched] = useState(false);
 
   const resetForm = () => {
     setMacId("");
@@ -40,10 +45,6 @@ const OnboardPodPage: React.FC = () => {
     setWifiSsid("");
     setWifiPassword("");
     setEditIndex(null);
-  };
-
-  const handleRemoveRow = (index: number) => {
-    setOnboardedPods((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -93,27 +94,6 @@ const OnboardPodPage: React.FC = () => {
         toast.error(data.error);
       } else if (response.ok) {
         toast.success(isEdit ? "Pod updated successfully" : "Pod onboarded successfully");
-
-        // Extract id from response - check common response shapes
-        const responseId = data?.id ?? data?.response?.id ?? data?.data?.id ?? data?.result?.id;
-
-        const podEntry: OnboardedPod = {
-          id: responseId,
-          mac_id: macId.trim(),
-          pod_id: podId.trim(),
-          wifi_ssid: wifiSsid.trim(),
-          wifi_password: wifiPassword.trim(),
-        };
-
-        if (isEdit) {
-          setOnboardedPods((prev) => {
-            const updated = [...prev];
-            updated[editIndex] = podEntry;
-            return updated;
-          });
-        } else {
-          setOnboardedPods((prev) => [...prev, podEntry]);
-        }
         resetForm();
       } else {
         toast.error(data?.message || "Failed to onboard pod");
@@ -126,42 +106,53 @@ const OnboardPodPage: React.FC = () => {
     }
   };
 
-  const handleEdit = (index: number) => {
-    const pod = onboardedPods[index];
+  const handleSearch = async () => {
+    if (!searchPodId.trim()) {
+      toast.error("Please enter a Pod ID to search");
+      return;
+    }
+    setSearching(true);
+    setHasSearched(true);
+    try {
+      const response = await fetch(
+        `${apiUrls.podcore}/onboard/list/?pod_id=${encodeURIComponent(searchPodId.trim())}`,
+        {
+          method: "GET",
+          headers: {
+            "accept": "application/json",
+            "Authorization": `Bearer ${accessToken}`,
+          },
+        }
+      );
+      const data = await response.json();
+      console.log("Search API response:", JSON.stringify(data));
+
+      if (response.ok) {
+        const records = Array.isArray(data) ? data : data?.records ?? data?.data ?? (data?.id ? [data] : []);
+        setSearchResults(records);
+        if (records.length === 0) {
+          toast.info("No onboarded pods found for this Pod ID");
+        }
+      } else {
+        setSearchResults([]);
+        toast.error(data?.message || data?.error || "No records found");
+      }
+    } catch (error) {
+      console.error("Error searching pods:", error);
+      toast.error("Network error while searching");
+      setSearchResults([]);
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const handleEditFromSearch = (pod: OnboardedPod) => {
     setMacId(pod.mac_id);
     setPodId(pod.pod_id);
     setWifiSsid(pod.wifi_ssid);
     setWifiPassword(pod.wifi_password);
-    setEditIndex(index);
+    setEditIndex(0);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleDelete = async (index: number) => {
-    const pod = onboardedPods[index];
-    const podApiId = pod.id;
-    if (!podApiId) {
-      toast.error("No ID available for deletion");
-      return;
-    }
-    try {
-      const response = await fetch(`${apiUrls.podcore}/onboard/${encodeURIComponent(podApiId)}`, {
-        method: "DELETE",
-        headers: {
-          "accept": "application/json",
-          "Authorization": `Bearer ${accessToken}`,
-        },
-      });
-      if (response.ok) {
-        toast.success("Pod deleted successfully");
-        setOnboardedPods((prev) => prev.filter((_, i) => i !== index));
-      } else {
-        const data = await response.json().catch(() => ({}));
-        toast.error(data?.error || data?.message || "Failed to delete pod");
-      }
-    } catch (error) {
-      console.error("Error deleting pod:", error);
-      toast.error("Network error while deleting pod");
-    }
   };
 
   if (!accessToken) {
@@ -260,28 +251,55 @@ const OnboardPodPage: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Results */}
-        {onboardedPods.length > 0 && (
-          <Card className="bg-white shadow-sm rounded-xl border-gray-200">
+        {/* Search Section */}
+        <Card className="bg-card shadow-sm rounded-xl border-border">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg font-semibold text-foreground">
+              Search Onboarded Pod
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-2 items-end">
+              <div className="flex-1 space-y-2">
+                <Label htmlFor="search_pod_id">Pod ID</Label>
+                <Input
+                  id="search_pod_id"
+                  placeholder="Enter Pod ID to search"
+                  value={searchPodId}
+                  onChange={(e) => setSearchPodId(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                />
+              </div>
+              <Button
+                onClick={handleSearch}
+                disabled={searching}
+                className="bg-[#FDDC4E] hover:bg-yellow-400 text-black flex items-center gap-1 h-10"
+              >
+                <Search className="h-4 w-4" />
+                {searching ? "Searching..." : "Search"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Search Results */}
+        {hasSearched && searchResults.length > 0 && (
+          <Card className="bg-card shadow-sm rounded-xl border-border">
             <CardHeader className="pb-4">
-              <CardTitle className="text-lg font-semibold text-gray-900">
-                Onboarded Pods
+              <CardTitle className="text-lg font-semibold text-foreground">
+                Search Results
               </CardTitle>
             </CardHeader>
             <CardContent>
               {isMobile ? (
                 <div className="flex flex-col gap-3">
-                  {onboardedPods.map((pod, index) => (
-                    <div key={index} className="relative border border-gray-200 rounded-lg p-4 bg-gray-50">
-                      {/* Close (remove row) button */}
-                      <button
-                        onClick={() => handleRemoveRow(index)}
-                        className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 transition-colors"
-                        title="Remove row"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                      <div className="space-y-2 text-sm pr-6">
+                  {searchResults.map((pod, index) => (
+                    <div key={index} className="border border-border rounded-lg p-4 bg-muted/30">
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground font-medium">ID</span>
+                          <span className="font-semibold">{pod.id ?? "-"}</span>
+                        </div>
                         <div className="flex justify-between">
                           <span className="text-muted-foreground font-medium">MAC ID</span>
                           <span>{pod.mac_id}</span>
@@ -299,12 +317,12 @@ const OnboardPodPage: React.FC = () => {
                           <span>{pod.wifi_password}</span>
                         </div>
                       </div>
-                      <div className="flex gap-2 mt-3 pt-3 border-t border-gray-200">
+                      <div className="flex gap-2 mt-3 pt-3 border-t border-border">
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleEdit(index)}
-                          className="h-8 flex-1 transition-colors bg-gray-100 text-gray-600 hover:bg-[#FDDC4E] hover:text-black"
+                          onClick={() => handleEditFromSearch(pod)}
+                          className="h-8 flex-1 transition-colors bg-muted text-muted-foreground hover:bg-[#FDDC4E] hover:text-black"
                         >
                           <Edit2 className="h-4 w-4 mr-1" /> Edit
                         </Button>
@@ -316,6 +334,7 @@ const OnboardPodPage: React.FC = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead>ID</TableHead>
                       <TableHead>MAC ID</TableHead>
                       <TableHead>Pod ID</TableHead>
                       <TableHead>Wifi SSID</TableHead>
@@ -324,33 +343,23 @@ const OnboardPodPage: React.FC = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {onboardedPods.map((pod, index) => (
+                    {searchResults.map((pod, index) => (
                       <TableRow key={index}>
+                        <TableCell className="font-medium">{pod.id ?? "-"}</TableCell>
                         <TableCell>{pod.mac_id}</TableCell>
                         <TableCell>{pod.pod_id}</TableCell>
                         <TableCell>{pod.wifi_ssid}</TableCell>
                         <TableCell>{pod.wifi_password}</TableCell>
                         <TableCell>
-                          <div className="flex gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleEdit(index)}
-                              className="h-8 w-8 p-0 transition-colors bg-gray-100 text-gray-600 hover:text-gray-800 hover:bg-[#FDDC4E] hover:text-black"
-                              title="Edit"
-                            >
-                              <Edit2 className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleRemoveRow(index)}
-                              className="h-8 w-8 p-0 transition-colors bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-700"
-                              title="Remove row"
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditFromSearch(pod)}
+                            className="h-8 w-8 p-0 transition-colors bg-muted text-muted-foreground hover:bg-[#FDDC4E] hover:text-black"
+                            title="Edit"
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))}
