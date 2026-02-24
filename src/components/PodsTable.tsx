@@ -262,8 +262,8 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
                 className="bg-[#FDDC4E] hover:bg-yellow-400 text-black flex items-center h-8 px-2 sm:px-3"
                 size="sm"
               >
-                <Plus className="w-4 h-4 sm:mr-1" />
-                <span className="hidden sm:inline">Add Pod</span>
+                <Plus className="w-4 h-4 mr-1" />
+                <span>Add Pod</span>
               </Button>
 
               <Button
@@ -271,8 +271,8 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
                 className="bg-[#FDDC4E] hover:bg-yellow-400 text-black flex items-center h-8 px-2 sm:px-3"
                 size="sm"
               >
-                <Cpu className="w-4 h-4 sm:mr-1" />
-                <span className="hidden sm:inline">Onboard Pod</span>
+                <Cpu className="w-4 h-4 mr-1" />
+                <span>Onboard Pod</span>
               </Button>
 
               <DropdownMenu>
