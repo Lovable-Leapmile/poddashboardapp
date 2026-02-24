@@ -65,31 +65,38 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
     fetchData();
   }, [fetchData]);
 
-  const StatusBadge: React.FC<{ value?: string }> = ({ value = "" }) => {
-    const v = value.toLowerCase();
+  const isPodActive = (pingedAt: string | undefined | null): boolean => {
+    if (!pingedAt) return false;
+    try {
+      const pingedTime = new Date(pingedAt.replace(" ", "T")).getTime();
+      const now = Date.now();
+      return (now - pingedTime) <= 5 * 60 * 1000; // 5 minutes
+    } catch {
+      return false;
+    }
+  };
+
+  const StatusBadge: React.FC<{ pingedAt?: string }> = ({ pingedAt }) => {
+    const active = isPodActive(pingedAt);
     return (
       <span
         className={cn(
           "px-2 py-1 rounded-full text-xs font-semibold inline-block",
-          v === "active"
-            ? "bg-green-100 text-green-800"
-            : v === "inactive"
-              ? "bg-red-100 text-red-800"
-              : "bg-gray-100 text-gray-800",
+          active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800",
         )}
       >
-        {value || "N/A"}
+        {active ? "Active" : "Inactive"}
       </span>
     );
   };
 
   const PowerStatusBadge: React.FC<{ value?: string }> = ({ value = "" }) => {
-    const v = (value || "").toUpperCase();
+    const v = (value || "").toLowerCase();
     return (
       <span
         className={cn(
           "px-2 py-1 rounded-full text-xs font-semibold inline-block",
-          v === "ON" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800",
+          v === "raw" ? "bg-green-100 text-green-800" : v === "ups" ? "bg-red-100 text-red-800" : "bg-gray-100 text-gray-800",
         )}
       >
         {value || "N/A"}
@@ -148,7 +155,7 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
       filter: true,
       flex: 1,
       minWidth: 100,
-      cellRenderer: ({ value }: { value: string }) => <StatusBadge value={value} />,
+      cellRenderer: ({ data }: { data: Pod }) => <StatusBadge pingedAt={data.pinged_at} />,
       cellClass: "text-center",
     },
     {
@@ -388,7 +395,7 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
                           </div>
                           <div className="flex items-center justify-between">
                             <span className="text-sm font-medium text-gray-700">Status:</span>
-                            <StatusBadge value={pod.status} />
+                            <StatusBadge pingedAt={pod.pinged_at} />
                           </div>
                           <div className="text-sm">
                             <span className="font-medium text-gray-700">Health:</span> {pod.pod_health}
