@@ -58,11 +58,6 @@ const OnboardPodPage: React.FC = () => {
       return;
     }
 
-    const macRegex = /^([0-9A-Fa-f]{2}:){4}[0-9A-Fa-f]{2}$/;
-    if (!macRegex.test(macId.trim())) {
-      toast.error("Invalid MAC ID format. Use format like AA:BB:CC:DD:EE");
-      return;
-    }
 
     if (podId.trim().length > 20) {
       toast.error("Pod ID must be 20 characters or less");
@@ -222,11 +217,10 @@ const OnboardPodPage: React.FC = () => {
                 <Label htmlFor="mac_id">MAC ID</Label>
                 <Input
                   id="mac_id"
-                  placeholder="AA:BB:CC:DD:EE"
+                  placeholder="Enter MAC ID"
                   value={macId}
-                  onChange={(e) => setMacId(e.target.value.slice(0, 17))}
+                  onChange={(e) => setMacId(e.target.value)}
                   required
-                  maxLength={17}
                 />
               </div>
               <div className="space-y-2">
