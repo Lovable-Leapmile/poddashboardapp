@@ -28,6 +28,7 @@ const OnboardPodPage: React.FC = () => {
 
   const [macId, setMacId] = useState("");
   const [podId, setPodId] = useState("");
+  const [doors, setDoors] = useState("");
   const [wifiSsid, setWifiSsid] = useState("");
   const [wifiPassword, setWifiPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -42,6 +43,7 @@ const OnboardPodPage: React.FC = () => {
   const resetForm = () => {
     setMacId("");
     setPodId("");
+    setDoors("");
     setWifiSsid("");
     setWifiPassword("");
     setEditIndex(null);
@@ -82,6 +84,7 @@ const OnboardPodPage: React.FC = () => {
         body: JSON.stringify({
           mac_id: macId.trim(),
           pod_id: podId.trim(),
+          doors: doors.trim(),
           wifi_ssid: wifiSsid.trim(),
           wifi_password: wifiPassword.trim(),
         }),
@@ -234,6 +237,18 @@ const OnboardPodPage: React.FC = () => {
                   onChange={(e) => setPodId(e.target.value.slice(0, 20))}
                   required
                   maxLength={20}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="doors">Number of Doors</Label>
+                <Input
+                  id="doors"
+                  type="number"
+                  placeholder="7"
+                  value={doors}
+                  onChange={(e) => setDoors(e.target.value)}
+                  required
+                  min={1}
                 />
               </div>
               <div className="space-y-2">
