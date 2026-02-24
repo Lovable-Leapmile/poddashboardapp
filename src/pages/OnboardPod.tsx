@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ArrowLeft, Send, Search, Edit2, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { apiUrls } from "@/lib/api";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -353,9 +354,18 @@ const OnboardPodPage: React.FC = () => {
                           <span className="text-muted-foreground font-medium">Wifi SSID</span>
                           <span>{pod.wifi_ssid}</span>
                         </div>
-                        <div className="flex justify-between">
+                         <div className="flex justify-between">
                           <span className="text-muted-foreground font-medium">Wifi Password</span>
                           <span>{pod.wifi_password}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground font-medium">Status</span>
+                          <span className={cn(
+                            "px-2 py-0.5 rounded-full text-xs font-semibold",
+                            (pod.status || "").toLowerCase() === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                          )}>
+                            {pod.status || "N/A"}
+                          </span>
                         </div>
                       </div>
                       <div className="flex gap-2 mt-3 pt-3 border-t border-border">
@@ -388,6 +398,7 @@ const OnboardPodPage: React.FC = () => {
                       <TableHead>Pod ID</TableHead>
                       <TableHead>Wifi SSID</TableHead>
                       <TableHead>Wifi Password</TableHead>
+                      <TableHead>Status</TableHead>
                       <TableHead>Action</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -399,6 +410,14 @@ const OnboardPodPage: React.FC = () => {
                         <TableCell>{pod.pod_id}</TableCell>
                         <TableCell>{pod.wifi_ssid}</TableCell>
                         <TableCell>{pod.wifi_password}</TableCell>
+                        <TableCell>
+                          <span className={cn(
+                            "px-2 py-0.5 rounded-full text-xs font-semibold",
+                            (pod.status || "").toLowerCase() === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                          )}>
+                            {pod.status || "N/A"}
+                          </span>
+                        </TableCell>
                         <TableCell>
                           <div className="flex gap-1">
                             <Button
