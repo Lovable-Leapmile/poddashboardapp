@@ -133,6 +133,44 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
         toast.error("Door test failed");
         setStatus((prev) => ({ ...prev, [key]: "failed" }));
       }
+    } else if (key === "bay_door") {
+      try {
+        await fetch(`${PUBSUB_BASE}/publish?topic=${encodeURIComponent(podId)}`, {
+          method: "POST",
+          headers: {
+            "accept": "application/json",
+            "Authorization": `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ action: "bay_door_test" }),
+        });
+
+        await new Promise((r) => setTimeout(r, 2000));
+        const res = await fetch(
+          `${PUBSUB_BASE}/subscribe?topic=${encodeURIComponent(podId)}&num_records=1`,
+          {
+            method: "GET",
+            headers: {
+              "accept": "application/json",
+              "Authorization": `Bearer ${accessToken}`,
+            },
+          }
+        );
+        const data = await res.json();
+        const record = Array.isArray(data) ? data[0] : data;
+        const test = record?.Test || record?.test || record?.action || "bay_door_test";
+        const test_status = record?.Test_Status || record?.test_status || record?.status || "Unknown";
+        setTestResult({ test, test_status });
+        if (test_status.toLowerCase() === "completed") {
+          setStatus((prev) => ({ ...prev, [key]: "success" }));
+        } else {
+          toast.error("Bay Door test failed. Please try again.");
+          setStatus((prev) => ({ ...prev, [key]: "failed" }));
+        }
+      } catch {
+        toast.error("Bay Door test failed");
+        setStatus((prev) => ({ ...prev, [key]: "failed" }));
+      }
     } else {
       // Simulate other tests for now
       await new Promise((r) => setTimeout(r, 1200));
