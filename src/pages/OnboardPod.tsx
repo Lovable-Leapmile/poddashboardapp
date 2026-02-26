@@ -6,12 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Send, Search, Edit2, Trash2 } from "lucide-react";
+import { ArrowLeft, Send, Search, Edit2, Trash2, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { apiUrls } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
+import CertifyPodPopup from "@/components/CertifyPodPopup";
 
 interface OnboardedPod {
   id?: number | string;
@@ -35,11 +36,11 @@ const OnboardPodPage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [editIndex, setEditIndex] = useState<number | null>(null);
 
-  // Search state
   const [searchPodId, setSearchPodId] = useState("");
   const [searching, setSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<OnboardedPod[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const [certifyPod, setCertifyPod] = useState<OnboardedPod | null>(null);
 
   const resetForm = () => {
     setMacId("");
@@ -52,18 +53,14 @@ const OnboardPodPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!macId.trim() || !podId.trim() || !wifiSsid.trim() || !wifiPassword.trim()) {
       toast.error("All fields are required");
       return;
     }
-
-
     if (podId.trim().length > 20) {
       toast.error("Pod ID must be 20 characters or less");
       return;
     }
-
     setSubmitting(true);
     try {
       const isEdit = editIndex !== null;
@@ -85,10 +82,8 @@ const OnboardPodPage: React.FC = () => {
           wifi_password: wifiPassword.trim(),
         }),
       });
-
       const data = await response.json();
       console.log("Onboard API response:", JSON.stringify(data));
-
       if (data?.error) {
         toast.error(data.error);
       } else if (response.ok) {
@@ -125,7 +120,6 @@ const OnboardPodPage: React.FC = () => {
       );
       const data = await response.json();
       console.log("Search API response:", JSON.stringify(data));
-
       if (response.ok) {
         const records = Array.isArray(data) ? data : data?.records ?? data?.data ?? (data?.id ? [data] : []);
         setSearchResults(records);
@@ -191,23 +185,17 @@ const OnboardPodPage: React.FC = () => {
   return (
     <Layout title="Onboard Pod" breadcrumb="Operations / Pods Management / Onboard Pod">
       <div className="w-full flex flex-col gap-6 animate-fade-in px-[4px]">
-        {/* Back button */}
         <div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate("/pods")}
-            className="flex items-center gap-1 h-8 px-3"
-          >
+          <Button variant="outline" size="sm" onClick={() => navigate("/pods")} className="flex items-center gap-1 h-8 px-3">
             <ArrowLeft className="h-4 w-4" />
             Back to Pods
           </Button>
         </div>
 
         {/* Form Card */}
-        <Card className="bg-white shadow-sm rounded-xl border-gray-200">
+        <Card className="bg-card shadow-sm rounded-xl border-border">
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-semibold text-gray-900">
+            <CardTitle className="text-lg font-semibold text-foreground">
               {editIndex !== null ? "Edit & Re-submit Pod" : "Onboard New Pod"}
             </CardTitle>
           </CardHeader>
@@ -215,72 +203,31 @@ const OnboardPodPage: React.FC = () => {
             <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="mac_id">MAC ID</Label>
-                <Input
-                  id="mac_id"
-                  placeholder="Enter MAC ID"
-                  value={macId}
-                  onChange={(e) => setMacId(e.target.value)}
-                  required
-                />
+                <Input id="mac_id" placeholder="Enter MAC ID" value={macId} onChange={(e) => setMacId(e.target.value)} required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="pod_id">Pod ID</Label>
-                <Input
-                  id="pod_id"
-                  placeholder="1002222"
-                  value={podId}
-                  onChange={(e) => setPodId(e.target.value.slice(0, 20))}
-                  required
-                  maxLength={20}
-                />
+                <Input id="pod_id" placeholder="1002222" value={podId} onChange={(e) => setPodId(e.target.value.slice(0, 20))} required maxLength={20} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="doors">Number of Doors</Label>
-                <Input
-                  id="doors"
-                  type="number"
-                  placeholder="7"
-                  value={doors}
-                  onChange={(e) => setDoors(e.target.value)}
-                  required
-                  min={1}
-                />
+                <Input id="doors" type="number" placeholder="7" value={doors} onChange={(e) => setDoors(e.target.value)} required min={1} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="wifi_ssid">Wifi SSID</Label>
-                <Input
-                  id="wifi_ssid"
-                  placeholder="WIFI_SSID"
-                  value={wifiSsid}
-                  onChange={(e) => setWifiSsid(e.target.value.slice(0, 50))}
-                  required
-                  maxLength={50}
-                />
+                <Input id="wifi_ssid" placeholder="WIFI_SSID" value={wifiSsid} onChange={(e) => setWifiSsid(e.target.value.slice(0, 50))} required maxLength={50} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="wifi_password">Wifi Password</Label>
-                <Input
-                  id="wifi_password"
-                  placeholder="WIFI_PASSWORD"
-                  value={wifiPassword}
-                  onChange={(e) => setWifiPassword(e.target.value.slice(0, 50))}
-                  required
-                  maxLength={50}
-                />
+                <Input id="wifi_password" placeholder="WIFI_PASSWORD" value={wifiPassword} onChange={(e) => setWifiPassword(e.target.value.slice(0, 50))} required maxLength={50} />
               </div>
               <div className="sm:col-span-2 flex gap-2 pt-2">
-                <Button
-                  type="submit"
-                  disabled={submitting}
-                  className="bg-[#FDDC4E] hover:bg-yellow-400 text-black flex items-center gap-1"
-                >
+                <Button type="submit" disabled={submitting} className="bg-[#FDDC4E] hover:bg-yellow-400 text-black flex items-center gap-1">
                   <Send className="h-4 w-4" />
                   {submitting ? "Submitting..." : editIndex !== null ? "Update Pod" : "Onboard Pod"}
                 </Button>
                 {editIndex !== null && (
-                  <Button type="button" variant="outline" onClick={resetForm}>
-                    Cancel Edit
-                  </Button>
+                  <Button type="button" variant="outline" onClick={resetForm}>Cancel Edit</Button>
                 )}
               </div>
             </form>
@@ -290,27 +237,15 @@ const OnboardPodPage: React.FC = () => {
         {/* Search Section */}
         <Card className="bg-card shadow-sm rounded-xl border-border">
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-semibold text-foreground">
-              Search Onboarded Pod
-            </CardTitle>
+            <CardTitle className="text-lg font-semibold text-foreground">Search Onboarded Pod</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex gap-2 items-end">
               <div className="flex-1 space-y-2">
                 <Label htmlFor="search_pod_id">Pod ID</Label>
-                <Input
-                  id="search_pod_id"
-                  placeholder="Enter Pod ID to search"
-                  value={searchPodId}
-                  onChange={(e) => setSearchPodId(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                />
+                <Input id="search_pod_id" placeholder="Enter Pod ID to search" value={searchPodId} onChange={(e) => setSearchPodId(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSearch()} />
               </div>
-              <Button
-                onClick={handleSearch}
-                disabled={searching}
-                className="bg-[#FDDC4E] hover:bg-yellow-400 text-black flex items-center gap-1 h-10"
-              >
+              <Button onClick={handleSearch} disabled={searching} className="bg-[#FDDC4E] hover:bg-yellow-400 text-black flex items-center gap-1 h-10">
                 <Search className="h-4 w-4" />
                 {searching ? "Searching..." : "Search"}
               </Button>
@@ -322,9 +257,7 @@ const OnboardPodPage: React.FC = () => {
         {hasSearched && searchResults.length > 0 && (
           <Card className="bg-card shadow-sm rounded-xl border-border">
             <CardHeader className="pb-4">
-              <CardTitle className="text-lg font-semibold text-foreground">
-                Search Results
-              </CardTitle>
+              <CardTitle className="text-lg font-semibold text-foreground">Search Results</CardTitle>
             </CardHeader>
             <CardContent>
               {isMobile ? (
@@ -345,14 +278,6 @@ const OnboardPodPage: React.FC = () => {
                           <span>{pod.pod_id}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground font-medium">Wifi SSID</span>
-                          <span>{pod.wifi_ssid}</span>
-                        </div>
-                         <div className="flex justify-between">
-                          <span className="text-muted-foreground font-medium">Wifi Password</span>
-                          <span>{pod.wifi_password}</span>
-                        </div>
-                        <div className="flex justify-between">
                           <span className="text-muted-foreground font-medium">Status</span>
                           <span className={cn(
                             "px-2 py-0.5 rounded-full text-xs font-semibold",
@@ -363,20 +288,16 @@ const OnboardPodPage: React.FC = () => {
                         </div>
                       </div>
                       <div className="flex gap-2 mt-3 pt-3 border-t border-border">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEditFromSearch(pod)}
-                          className="h-8 flex-1 transition-colors bg-muted text-muted-foreground hover:bg-[#FDDC4E] hover:text-black"
-                        >
+                        <Button variant="ghost" size="sm" onClick={() => handleEditFromSearch(pod)}
+                          className="h-8 flex-1 transition-colors bg-muted text-muted-foreground hover:bg-[#FDDC4E] hover:text-black">
                           <Edit2 className="h-4 w-4 mr-1" /> Edit
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteOnboard(pod)}
-                          className="h-8 flex-1 transition-colors bg-muted text-red-500 hover:bg-red-100 hover:text-red-700"
-                        >
+                        <Button variant="ghost" size="sm" onClick={() => setCertifyPod(pod)}
+                          className="h-8 flex-1 transition-colors bg-muted text-muted-foreground hover:bg-[#FDDC4E] hover:text-black">
+                          <Shield className="h-4 w-4 mr-1" /> Certify
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleDeleteOnboard(pod)}
+                          className="h-8 flex-1 transition-colors bg-muted text-red-500 hover:bg-red-100 hover:text-red-700">
                           <Trash2 className="h-4 w-4 mr-1" /> Delete
                         </Button>
                       </div>
@@ -390,8 +311,6 @@ const OnboardPodPage: React.FC = () => {
                       <TableHead>ID</TableHead>
                       <TableHead>MAC ID</TableHead>
                       <TableHead>Pod ID</TableHead>
-                      <TableHead>Wifi SSID</TableHead>
-                      <TableHead>Wifi Password</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Action</TableHead>
                     </TableRow>
@@ -402,8 +321,6 @@ const OnboardPodPage: React.FC = () => {
                         <TableCell className="font-medium">{pod.id ?? "-"}</TableCell>
                         <TableCell>{pod.mac_id}</TableCell>
                         <TableCell>{pod.pod_id}</TableCell>
-                        <TableCell>{pod.wifi_ssid}</TableCell>
-                        <TableCell>{pod.wifi_password}</TableCell>
                         <TableCell>
                           <span className={cn(
                             "px-2 py-0.5 rounded-full text-xs font-semibold",
@@ -414,22 +331,16 @@ const OnboardPodPage: React.FC = () => {
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleEditFromSearch(pod)}
-                              className="h-8 w-8 p-0 transition-colors bg-muted text-muted-foreground hover:bg-[#FDDC4E] hover:text-black"
-                              title="Edit"
-                            >
+                            <Button variant="ghost" size="sm" onClick={() => handleEditFromSearch(pod)}
+                              className="h-8 w-8 p-0 transition-colors bg-muted text-muted-foreground hover:bg-[#FDDC4E] hover:text-black" title="Edit">
                               <Edit2 className="h-4 w-4" />
                             </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteOnboard(pod)}
-                              className="h-8 w-8 p-0 transition-colors bg-muted text-red-500 hover:bg-red-100 hover:text-red-700"
-                              title="Delete"
-                            >
+                            <Button variant="ghost" size="sm" onClick={() => setCertifyPod(pod)}
+                              className="h-8 w-8 p-0 transition-colors bg-muted text-muted-foreground hover:bg-[#FDDC4E] hover:text-black" title="Certify Pod">
+                              <Shield className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={() => handleDeleteOnboard(pod)}
+                              className="h-8 w-8 p-0 transition-colors bg-muted text-red-500 hover:bg-red-100 hover:text-red-700" title="Delete">
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
@@ -442,6 +353,12 @@ const OnboardPodPage: React.FC = () => {
             </CardContent>
           </Card>
         )}
+
+        <CertifyPodPopup
+          open={!!certifyPod}
+          onClose={() => setCertifyPod(null)}
+          podId={certifyPod?.pod_id || ""}
+        />
       </div>
     </Layout>
   );
