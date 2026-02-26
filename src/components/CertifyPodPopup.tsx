@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, Shield, Bell, DoorOpen, Warehouse, Zap, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface CertifyPodPopupProps {
   open: boolean;
@@ -39,15 +41,59 @@ const initialStatus: TestStatus = {
   network_speed: "idle",
 };
 
+const PUBSUB_BASE = "https://rakesh.leapmile.com/pubsub";
+
 const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId }) => {
+  const { accessToken } = useAuth();
   const [status, setStatus] = useState<TestStatus>({ ...initialStatus });
   const [running, setRunning] = useState<TestKey | null>(null);
+  const [testResult, setTestResult] = useState<{ test: string; test_status: string } | null>(null);
 
   const handleTest = async (key: TestKey) => {
     if (status[key] === "success" || running !== null) return;
     setRunning(key);
-    await new Promise((r) => setTimeout(r, 1200));
-    setStatus((prev) => ({ ...prev, [key]: "success" }));
+
+    if (key === "buzzer") {
+      try {
+        // POST buzzer_test
+        await fetch(`${PUBSUB_BASE}/publish?topic=${encodeURIComponent(podId)}`, {
+          method: "POST",
+          headers: {
+            "accept": "application/json",
+            "Authorization": `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ action: "buzzer_test" }),
+        });
+
+        // Wait a moment then GET result
+        await new Promise((r) => setTimeout(r, 2000));
+        const res = await fetch(
+          `${PUBSUB_BASE}/subscribe?topic=${encodeURIComponent(podId)}&num_records=1`,
+          {
+            method: "GET",
+            headers: {
+              "accept": "application/json",
+              "Authorization": `Bearer ${accessToken}`,
+            },
+          }
+        );
+        const data = await res.json();
+        const record = Array.isArray(data) ? data[0] : data;
+        const test = record?.Test || record?.test || record?.action || "buzzer_test";
+        const test_status = record?.Test_Status || record?.test_status || record?.status || "Unknown";
+        setTestResult({ test, test_status });
+        setStatus((prev) => ({ ...prev, [key]: "success" }));
+      } catch {
+        toast.error("Buzzer test failed");
+        setStatus((prev) => ({ ...prev, [key]: "failed" }));
+      }
+    } else {
+      // Simulate other tests for now
+      await new Promise((r) => setTimeout(r, 1200));
+      setStatus((prev) => ({ ...prev, [key]: "success" }));
+    }
+
     setRunning(null);
   };
 
@@ -58,12 +104,14 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
   const handleCertify = () => {
     onClose();
     setStatus({ ...initialStatus });
+    setTestResult(null);
   };
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       onClose();
       setStatus({ ...initialStatus });
+      setTestResult(null);
     }
   };
 
@@ -140,6 +188,17 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
             );
           })}
         </div>
+
+        {/* Test Result Popup */}
+        {testResult && (
+          <div className="mx-6 mt-3 p-4 rounded-lg border border-border bg-muted/50 flex items-center justify-between">
+            <div className="flex flex-col gap-1 text-sm">
+              <div><span className="font-semibold text-foreground">Test:</span> <span className="text-muted-foreground">{testResult.test}</span></div>
+              <div><span className="font-semibold text-foreground">Status:</span> <span className="text-muted-foreground">{testResult.test_status}</span></div>
+            </div>
+            <button onClick={() => setTestResult(null)} className="text-xs text-muted-foreground hover:text-foreground underline ml-4">Dismiss</button>
+          </div>
+        )}
 
         {/* Footer */}
         <div className="flex flex-col items-center gap-3 px-6 pt-5 pb-6">
