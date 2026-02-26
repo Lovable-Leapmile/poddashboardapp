@@ -20,63 +20,52 @@ interface TestStatus {
   network_speed: "idle" | "success" | "failed";
 }
 
-const testLabels: Record<TestKey, string> = {
-  buzzer: "Buzzer",
-  doors: "Doors",
-  bay_door: "Bay Door",
-  ups: "UPS",
-  network_speed: "Network Speed",
+const testConfig: Record<TestKey, { label: string; color: string }> = {
+  buzzer: { label: "Buzzer", color: "bg-blue-500 hover:bg-blue-600 text-white" },
+  doors: { label: "Doors", color: "bg-orange-500 hover:bg-orange-600 text-white" },
+  bay_door: { label: "Bay Door", color: "bg-purple-500 hover:bg-purple-600 text-white" },
+  ups: { label: "UPS", color: "bg-teal-500 hover:bg-teal-600 text-white" },
+  network_speed: { label: "Network Speed", color: "bg-indigo-500 hover:bg-indigo-600 text-white" },
+};
+
+const initialStatus: TestStatus = {
+  buzzer: "idle",
+  doors: "idle",
+  bay_door: "idle",
+  ups: "idle",
+  network_speed: "idle",
 };
 
 const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId }) => {
-  const [status, setStatus] = useState<TestStatus>({
-    buzzer: "idle",
-    doors: "idle",
-    bay_door: "idle",
-    ups: "idle",
-    network_speed: "idle",
-  });
+  const [status, setStatus] = useState<TestStatus>({ ...initialStatus });
   const [running, setRunning] = useState<TestKey | null>(null);
 
   const handleTest = async (key: TestKey) => {
     setRunning(key);
-    // Simulate test — replace with real API calls as needed
     await new Promise((r) => setTimeout(r, 1200));
     setStatus((prev) => ({ ...prev, [key]: "success" }));
     setRunning(null);
   };
 
-  const allPassed = (Object.keys(testLabels) as TestKey[]).every(
+  const allPassed = (Object.keys(testConfig) as TestKey[]).every(
     (k) => status[k] === "success"
   );
 
   const handleCertify = () => {
     onClose();
-    setStatus({
-      buzzer: "idle",
-      doors: "idle",
-      bay_door: "idle",
-      ups: "idle",
-      network_speed: "idle",
-    });
+    setStatus({ ...initialStatus });
   };
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       onClose();
-      setStatus({
-        buzzer: "idle",
-        doors: "idle",
-        bay_door: "idle",
-        ups: "idle",
-        network_speed: "idle",
-      });
+      setStatus({ ...initialStatus });
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-xl w-[95vw]">
+      <DialogContent className="sm:max-w-2xl w-[95vw]">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold flex items-center gap-2">
             <Shield className="h-5 w-5 text-primary" />
@@ -84,21 +73,20 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
           </DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-3 mt-2">
-          {(Object.keys(testLabels) as TestKey[]).map((key) => (
+          {(Object.keys(testConfig) as TestKey[]).map((key) => (
             <div
               key={key}
               className="flex items-center justify-between border border-border rounded-lg px-4 py-3"
             >
               <Button
-                variant="outline"
                 disabled={status[key] === "success" || running !== null}
                 onClick={() => handleTest(key)}
                 className={cn(
-                  "min-w-[140px]",
-                  status[key] === "success" && "opacity-60"
+                  "min-w-[160px] font-semibold",
+                  status[key] === "success" ? "opacity-50 bg-muted text-muted-foreground" : testConfig[key].color
                 )}
               >
-                {running === key ? "Testing..." : testLabels[key]}
+                {running === key ? "Testing..." : testConfig[key].label}
               </Button>
               <div className="ml-4">
                 {status[key] === "success" && (

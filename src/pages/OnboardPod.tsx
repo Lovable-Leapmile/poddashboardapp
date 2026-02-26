@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Send, Search, Edit2, Trash2, Shield } from "lucide-react";
+import { ArrowLeft, Send, Search, Edit2, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { apiUrls } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -83,7 +83,6 @@ const OnboardPodPage: React.FC = () => {
         }),
       });
       const data = await response.json();
-      console.log("Onboard API response:", JSON.stringify(data));
       if (data?.error) {
         toast.error(data.error);
       } else if (response.ok) {
@@ -93,7 +92,6 @@ const OnboardPodPage: React.FC = () => {
         toast.error(data?.message || "Failed to onboard pod");
       }
     } catch (error) {
-      console.error("Error onboarding pod:", error);
       toast.error("Network error while onboarding pod");
     } finally {
       setSubmitting(false);
@@ -110,28 +108,18 @@ const OnboardPodPage: React.FC = () => {
     try {
       const response = await fetch(
         `${apiUrls.podcore}/onboard/list/?pod_id=${encodeURIComponent(searchPodId.trim())}`,
-        {
-          method: "GET",
-          headers: {
-            "accept": "application/json",
-            "Authorization": `Bearer ${accessToken}`,
-          },
-        }
+        { method: "GET", headers: { "accept": "application/json", "Authorization": `Bearer ${accessToken}` } }
       );
       const data = await response.json();
-      console.log("Search API response:", JSON.stringify(data));
       if (response.ok) {
         const records = Array.isArray(data) ? data : data?.records ?? data?.data ?? (data?.id ? [data] : []);
         setSearchResults(records);
-        if (records.length === 0) {
-          toast.info("No onboarded pods found for this Pod ID");
-        }
+        if (records.length === 0) toast.info("No onboarded pods found for this Pod ID");
       } else {
         setSearchResults([]);
         toast.error(data?.message || data?.error || "No records found");
       }
     } catch (error) {
-      console.error("Error searching pods:", error);
       toast.error("Network error while searching");
       setSearchResults([]);
     } finally {
@@ -149,17 +137,11 @@ const OnboardPodPage: React.FC = () => {
   };
 
   const handleDeleteOnboard = async (pod: OnboardedPod) => {
-    if (!pod.id) {
-      toast.error("No ID available for deletion");
-      return;
-    }
+    if (!pod.id) { toast.error("No ID available for deletion"); return; }
     try {
       const response = await fetch(`${apiUrls.podcore}/onboard/${encodeURIComponent(pod.id)}`, {
         method: "DELETE",
-        headers: {
-          "accept": "application/json",
-          "Authorization": `Bearer ${accessToken}`,
-        },
+        headers: { "accept": "application/json", "Authorization": `Bearer ${accessToken}` },
       });
       if (response.ok) {
         toast.success("Pod deleted successfully");
@@ -169,7 +151,6 @@ const OnboardPodPage: React.FC = () => {
         toast.error(data?.error || data?.message || "Failed to delete pod");
       }
     } catch (error) {
-      console.error("Error deleting pod:", error);
       toast.error("Network error while deleting pod");
     }
   };
@@ -187,8 +168,7 @@ const OnboardPodPage: React.FC = () => {
       <div className="w-full flex flex-col gap-6 animate-fade-in px-[4px]">
         <div>
           <Button variant="outline" size="sm" onClick={() => navigate("/pods")} className="flex items-center gap-1 h-8 px-3">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Pods
+            <ArrowLeft className="h-4 w-4" /> Back to Pods
           </Button>
         </div>
 
@@ -287,19 +267,21 @@ const OnboardPodPage: React.FC = () => {
                           </span>
                         </div>
                       </div>
-                      <div className="flex gap-2 mt-3 pt-3 border-t border-border">
-                        <Button variant="ghost" size="sm" onClick={() => handleEditFromSearch(pod)}
-                          className="h-8 flex-1 transition-colors bg-muted text-muted-foreground hover:bg-[#FDDC4E] hover:text-black">
-                          <Edit2 className="h-4 w-4 mr-1" /> Edit
+                      <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-border">
+                        <Button size="sm" onClick={() => setCertifyPod(pod)}
+                          className="h-8 w-full bg-[#FDDC4E] hover:bg-yellow-400 text-black font-semibold">
+                          Certify Pod
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => setCertifyPod(pod)}
-                          className="h-8 flex-1 transition-colors bg-muted text-muted-foreground hover:bg-[#FDDC4E] hover:text-black">
-                          <Shield className="h-4 w-4 mr-1" /> Certify
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleDeleteOnboard(pod)}
-                          className="h-8 flex-1 transition-colors bg-muted text-red-500 hover:bg-red-100 hover:text-red-700">
-                          <Trash2 className="h-4 w-4 mr-1" /> Delete
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button variant="ghost" size="sm" onClick={() => handleEditFromSearch(pod)}
+                            className="h-8 flex-1 transition-colors bg-muted text-muted-foreground hover:bg-[#FDDC4E] hover:text-black">
+                            <Edit2 className="h-4 w-4 mr-1" /> Edit
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleDeleteOnboard(pod)}
+                            className="h-8 flex-1 transition-colors bg-muted text-red-500 hover:bg-red-100 hover:text-red-700">
+                            <Trash2 className="h-4 w-4 mr-1" /> Delete
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -312,6 +294,7 @@ const OnboardPodPage: React.FC = () => {
                       <TableHead>MAC ID</TableHead>
                       <TableHead>Pod ID</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead>Certify</TableHead>
                       <TableHead>Action</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -330,14 +313,16 @@ const OnboardPodPage: React.FC = () => {
                           </span>
                         </TableCell>
                         <TableCell>
+                          <Button size="sm" onClick={() => setCertifyPod(pod)}
+                            className="h-7 px-3 bg-[#FDDC4E] hover:bg-yellow-400 text-black text-xs font-semibold">
+                            Certify Pod
+                          </Button>
+                        </TableCell>
+                        <TableCell>
                           <div className="flex gap-1">
                             <Button variant="ghost" size="sm" onClick={() => handleEditFromSearch(pod)}
                               className="h-8 w-8 p-0 transition-colors bg-muted text-muted-foreground hover:bg-[#FDDC4E] hover:text-black" title="Edit">
                               <Edit2 className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm" onClick={() => setCertifyPod(pod)}
-                              className="h-8 w-8 p-0 transition-colors bg-muted text-muted-foreground hover:bg-[#FDDC4E] hover:text-black" title="Certify Pod">
-                              <Shield className="h-4 w-4" />
                             </Button>
                             <Button variant="ghost" size="sm" onClick={() => handleDeleteOnboard(pod)}
                               className="h-8 w-8 p-0 transition-colors bg-muted text-red-500 hover:bg-red-100 hover:text-red-700" title="Delete">
