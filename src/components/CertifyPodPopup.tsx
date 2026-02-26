@@ -189,16 +189,19 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
           })}
         </div>
 
-        {/* Test Result Popup */}
-        {testResult && (
-          <div className="mx-6 mt-3 p-4 rounded-lg border border-border bg-muted/50 flex items-center justify-between">
-            <div className="flex flex-col gap-1 text-sm">
-              <div><span className="font-semibold text-foreground">Test:</span> <span className="text-muted-foreground">{testResult.test}</span></div>
-              <div><span className="font-semibold text-foreground">Status:</span> <span className="text-muted-foreground">{testResult.test_status}</span></div>
+        {/* Test Result Dialog */}
+        <Dialog open={!!testResult} onOpenChange={(o) => { if (!o) setTestResult(null); }}>
+          <DialogContent className="sm:max-w-xs w-[80vw] p-6">
+            <DialogHeader>
+              <DialogTitle className="text-base font-bold">Test Result</DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col gap-2 text-sm mt-2">
+              <div><span className="font-semibold text-foreground">Test:</span> <span className="text-muted-foreground">{testResult?.test}</span></div>
+              <div><span className="font-semibold text-foreground">Status:</span> <span className="text-muted-foreground">{testResult?.test_status}</span></div>
             </div>
-            <button onClick={() => setTestResult(null)} className="text-xs text-muted-foreground hover:text-foreground underline ml-4">Dismiss</button>
-          </div>
-        )}
+            <Button variant="outline" className="mt-4 w-full" onClick={() => setTestResult(null)}>Close</Button>
+          </DialogContent>
+        </Dialog>
 
         {/* Footer */}
         <div className="flex flex-col items-center gap-3 px-6 pt-5 pb-6">
