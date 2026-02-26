@@ -47,7 +47,7 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
   const { accessToken } = useAuth();
   const [status, setStatus] = useState<TestStatus>({ ...initialStatus });
   const [running, setRunning] = useState<TestKey | null>(null);
-  const [testResult, setTestResult] = useState<{ test: string; test_status: string } | null>(null);
+  const [testResult, setTestResult] = useState<{ test: string; test_status: string; doors_failed?: number } | null>(null);
 
   const handleTest = async (key: TestKey) => {
     if (status[key] === "success" || running !== null) return;
@@ -83,7 +83,12 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
         const test = record?.Test || record?.test || record?.action || "buzzer_test";
         const test_status = record?.Test_Status || record?.test_status || record?.status || "Unknown";
         setTestResult({ test, test_status });
-        setStatus((prev) => ({ ...prev, [key]: "success" }));
+        if (test_status.toLowerCase() === "completed") {
+          setStatus((prev) => ({ ...prev, [key]: "success" }));
+        } else {
+          toast.error("Buzzer test failed. Please try again.");
+          setStatus((prev) => ({ ...prev, [key]: "failed" }));
+        }
       } catch {
         toast.error("Buzzer test failed");
         setStatus((prev) => ({ ...prev, [key]: "failed" }));
@@ -115,13 +120,14 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
         const record = Array.isArray(data) ? data[0] : data;
         const test = record?.Test || record?.test || record?.action || "door_test";
         const test_status = record?.Test_Status || record?.test_status || record?.status || "Unknown";
-        setTestResult({ test, test_status });
+        const doors_failed = record?.doors_failed ?? record?.Doors_Failed ?? undefined;
+        setTestResult({ test, test_status, doors_failed: doors_failed != null ? Number(doors_failed) : undefined });
 
-        if (test_status.toLowerCase() === "failed") {
+        if (test_status.toLowerCase() === "completed") {
+          setStatus((prev) => ({ ...prev, [key]: "success" }));
+        } else {
           toast.error("Door test failed. Please try again.");
           setStatus((prev) => ({ ...prev, [key]: "failed" }));
-        } else {
-          setStatus((prev) => ({ ...prev, [key]: "success" }));
         }
       } catch {
         toast.error("Door test failed");
@@ -242,6 +248,9 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
             <div className="flex flex-col gap-2 text-sm mt-2">
               <div><span className="font-semibold text-foreground">Test:</span> <span className="text-muted-foreground">{testResult?.test}</span></div>
               <div><span className="font-semibold text-foreground">Status:</span> <span className="text-muted-foreground">{testResult?.test_status}</span></div>
+              {testResult?.doors_failed != null && (
+                <div><span className="font-semibold text-foreground">Doors Failed:</span> <span className="text-destructive font-medium">{testResult.doors_failed}</span></div>
+              )}
             </div>
             <Button variant="outline" className="mt-4 w-full" onClick={() => setTestResult(null)}>Close</Button>
           </DialogContent>
