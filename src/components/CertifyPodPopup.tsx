@@ -20,12 +20,12 @@ interface TestStatus {
   network_speed: "idle" | "success" | "failed";
 }
 
-const testConfig: Record<TestKey, { label: string; color: string }> = {
-  buzzer: { label: "Buzzer", color: "bg-blue-500 hover:bg-blue-600 text-white" },
-  doors: { label: "Doors", color: "bg-orange-500 hover:bg-orange-600 text-white" },
-  bay_door: { label: "Bay Door", color: "bg-purple-500 hover:bg-purple-600 text-white" },
-  ups: { label: "UPS", color: "bg-teal-500 hover:bg-teal-600 text-white" },
-  network_speed: { label: "Network Speed", color: "bg-indigo-500 hover:bg-indigo-600 text-white" },
+const testLabels: Record<TestKey, string> = {
+  buzzer: "Buzzer",
+  doors: "Doors",
+  bay_door: "Bay Door",
+  ups: "UPS",
+  network_speed: "Network Speed",
 };
 
 const initialStatus: TestStatus = {
@@ -47,7 +47,7 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
     setRunning(null);
   };
 
-  const allPassed = (Object.keys(testConfig) as TestKey[]).every(
+  const allPassed = (Object.keys(testLabels) as TestKey[]).every(
     (k) => status[k] === "success"
   );
 
@@ -73,7 +73,7 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
           </DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-3 mt-2">
-          {(Object.keys(testConfig) as TestKey[]).map((key) => (
+          {(Object.keys(testLabels) as TestKey[]).map((key) => (
             <div
               key={key}
               className="flex items-center justify-between border border-border rounded-lg px-4 py-3"
@@ -83,10 +83,12 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
                 onClick={() => handleTest(key)}
                 className={cn(
                   "min-w-[160px] font-semibold",
-                  status[key] === "success" ? "opacity-50 bg-muted text-muted-foreground" : testConfig[key].color
+                  status[key] === "success"
+                    ? "opacity-40 bg-primary/50 text-primary-foreground"
+                    : "bg-primary text-primary-foreground hover:bg-primary/80"
                 )}
               >
-                {running === key ? "Testing..." : testConfig[key].label}
+                {running === key ? "Testing..." : testLabels[key]}
               </Button>
               <div className="ml-4">
                 {status[key] === "success" && (
