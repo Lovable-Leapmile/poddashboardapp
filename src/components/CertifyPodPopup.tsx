@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, XCircle, Shield } from "lucide-react";
+import { CheckCircle2, Shield, Bell, DoorOpen, Warehouse, Zap, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Progress } from "@/components/ui/progress";
 
 interface CertifyPodPopupProps {
   open: boolean;
@@ -20,13 +21,15 @@ interface TestStatus {
   network_speed: "idle" | "success" | "failed";
 }
 
-const testLabels: Record<TestKey, string> = {
-  buzzer: "Buzzer",
-  doors: "Doors",
-  bay_door: "Bay Door",
-  ups: "UPS",
-  network_speed: "Network Speed",
+const testConfig: Record<TestKey, { label: string; icon: React.ElementType }> = {
+  buzzer: { label: "Buzzer", icon: Bell },
+  doors: { label: "Doors", icon: DoorOpen },
+  bay_door: { label: "Bay Door", icon: Warehouse },
+  ups: { label: "UPS", icon: Zap },
+  network_speed: { label: "Network Speed", icon: Globe },
 };
+
+const testKeys: TestKey[] = ["buzzer", "doors", "bay_door", "ups", "network_speed"];
 
 const initialStatus: TestStatus = {
   buzzer: "idle",
@@ -41,15 +44,16 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
   const [running, setRunning] = useState<TestKey | null>(null);
 
   const handleTest = async (key: TestKey) => {
+    if (status[key] === "success" || running !== null) return;
     setRunning(key);
     await new Promise((r) => setTimeout(r, 1200));
     setStatus((prev) => ({ ...prev, [key]: "success" }));
     setRunning(null);
   };
 
-  const allPassed = (Object.keys(testLabels) as TestKey[]).every(
-    (k) => status[k] === "success"
-  );
+  const completedCount = testKeys.filter((k) => status[k] === "success").length;
+  const allPassed = completedCount === testKeys.length;
+  const progressPercent = (completedCount / testKeys.length) * 100;
 
   const handleCertify = () => {
     onClose();
@@ -65,53 +69,97 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-2xl w-[95vw]">
-        <DialogHeader>
-          <DialogTitle className="text-lg font-semibold flex items-center gap-2">
-            <Shield className="h-5 w-5 text-primary" />
-            Certify Pod — {podId}
-          </DialogTitle>
-        </DialogHeader>
-        <div className="flex flex-col gap-3 mt-2">
-          {(Object.keys(testLabels) as TestKey[]).map((key) => (
-            <div
-              key={key}
-              className="flex items-center justify-between border border-border rounded-lg px-4 py-3"
-            >
-              <Button
-                disabled={status[key] === "success" || running !== null}
+      <DialogContent className="sm:max-w-2xl w-[95vw] p-0 overflow-hidden">
+        {/* Header */}
+        <div className="px-6 pt-6 pb-4">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
+                <Shield className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <div>Certify Pod #{podId}</div>
+                <div className="text-sm font-normal text-muted-foreground mt-0.5">
+                  Status: {allPassed ? "Certified" : "Pending Certification"}
+                </div>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+        </div>
+
+        {/* Progress */}
+        <div className="px-6 pb-4">
+          <div className="text-sm text-muted-foreground mb-2">
+            Progress: {completedCount} / {testKeys.length} Completed
+          </div>
+          <Progress value={progressPercent} className="h-2" />
+        </div>
+
+        {/* Test Items */}
+        <div className="px-6 flex flex-col gap-3">
+          {testKeys.map((key) => {
+            const config = testConfig[key];
+            const Icon = config.icon;
+            const isSuccess = status[key] === "success";
+            const isRunning = running === key;
+
+            return (
+              <div
+                key={key}
                 onClick={() => handleTest(key)}
                 className={cn(
-                  "min-w-[160px] font-semibold",
-                  status[key] === "success"
-                    ? "opacity-40 bg-primary/50 text-primary-foreground"
-                    : "bg-primary text-primary-foreground hover:bg-primary/80"
+                  "flex items-center justify-between border border-border rounded-xl px-5 py-4 cursor-pointer transition-all",
+                  isSuccess
+                    ? "bg-primary/10 border-primary/30"
+                    : "hover:bg-muted/50",
+                  (isSuccess || (running !== null && !isRunning)) && "pointer-events-none"
                 )}
               >
-                {running === key ? "Testing..." : testLabels[key]}
-              </Button>
-              <div className="ml-4">
-                {status[key] === "success" && (
-                  <CheckCircle2 className="h-6 w-6 text-green-500" />
-                )}
-                {status[key] === "failed" && (
-                  <XCircle className="h-6 w-6 text-red-500" />
-                )}
-                {status[key] === "idle" && (
-                  <span className="h-6 w-6 inline-block rounded-full border-2 border-muted-foreground/30" />
-                )}
+                <div className="flex items-center gap-4">
+                  <div className={cn(
+                    "h-10 w-10 rounded-lg flex items-center justify-center",
+                    isSuccess ? "bg-primary/20" : "bg-muted"
+                  )}>
+                    <Icon className={cn(
+                      "h-5 w-5",
+                      isSuccess ? "text-primary" : "text-muted-foreground"
+                    )} />
+                  </div>
+                  <span className={cn(
+                    "text-base font-medium",
+                    isSuccess ? "text-foreground" : "text-foreground"
+                  )}>
+                    {isRunning ? `Testing ${config.label}...` : config.label}
+                  </span>
+                </div>
+                <div>
+                  {isSuccess ? (
+                    <CheckCircle2 className="h-7 w-7 text-green-600" />
+                  ) : (
+                    <span className="h-7 w-7 inline-block rounded-full border-2 border-muted-foreground/30" />
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
-        <div className="flex justify-center mt-4">
+
+        {/* Footer */}
+        <div className="flex flex-col items-center gap-3 px-6 pt-5 pb-6">
           <Button
             disabled={!allPassed}
             onClick={handleCertify}
-            className="bg-[#FDDC4E] hover:bg-yellow-400 text-black px-8 py-2 text-base font-semibold"
+            className="bg-primary hover:bg-primary/80 text-primary-foreground px-10 py-3 text-base font-semibold rounded-full flex items-center gap-2"
           >
-            Certify
+            <CheckCircle2 className="h-5 w-5" />
+            Complete Certification
           </Button>
+          <button
+            onClick={() => handleOpenChange(false)}
+            className="text-sm text-muted-foreground underline hover:text-foreground transition-colors"
+          >
+            Cancel
+          </button>
         </div>
       </DialogContent>
     </Dialog>
