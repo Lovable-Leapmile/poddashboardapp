@@ -21,12 +21,12 @@ interface TestStatus {
   network_speed: "idle" | "success" | "failed";
 }
 
-const testConfig: Record<TestKey, { label: string; icon: React.ElementType }> = {
-  buzzer: { label: "Buzzer", icon: Bell },
-  doors: { label: "Doors", icon: DoorOpen },
-  bay_door: { label: "Bay Door", icon: Warehouse },
-  ups: { label: "UPS", icon: Zap },
-  network_speed: { label: "Network Speed", icon: Globe },
+const testConfig: Record<TestKey, { label: string; icon: React.ElementType; iconColor: string; bgColor: string }> = {
+  buzzer: { label: "Buzzer", icon: Bell, iconColor: "text-amber-500", bgColor: "bg-amber-100" },
+  doors: { label: "Doors", icon: DoorOpen, iconColor: "text-green-600", bgColor: "bg-green-100" },
+  bay_door: { label: "Bay Door", icon: Warehouse, iconColor: "text-amber-600", bgColor: "bg-amber-50" },
+  ups: { label: "UPS", icon: Zap, iconColor: "text-amber-500", bgColor: "bg-amber-100" },
+  network_speed: { label: "Network Speed", icon: Globe, iconColor: "text-amber-500", bgColor: "bg-amber-100" },
 };
 
 const testKeys: TestKey[] = ["buzzer", "doors", "bay_door", "ups", "network_speed"];
@@ -118,12 +118,9 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
                 <div className="flex items-center gap-4">
                   <div className={cn(
                     "h-10 w-10 rounded-lg flex items-center justify-center",
-                    isSuccess ? "bg-primary/20" : "bg-muted"
+                    config.bgColor
                   )}>
-                    <Icon className={cn(
-                      "h-5 w-5",
-                      isSuccess ? "text-primary" : "text-muted-foreground"
-                    )} />
+                    <Icon className={cn("h-5 w-5", config.iconColor)} />
                   </div>
                   <span className={cn(
                     "text-base font-medium",
