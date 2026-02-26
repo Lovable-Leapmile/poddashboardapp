@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Shield, Bell, DoorOpen, Warehouse, Zap, Globe } from "lucide-react";
+import { CheckCircle2, Shield, Bell, DoorOpen, Warehouse, Zap, Globe, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
@@ -88,6 +88,45 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
         toast.error("Buzzer test failed");
         setStatus((prev) => ({ ...prev, [key]: "failed" }));
       }
+    } else if (key === "doors") {
+      try {
+        await fetch(`${PUBSUB_BASE}/publish?topic=${encodeURIComponent(podId)}`, {
+          method: "POST",
+          headers: {
+            "accept": "application/json",
+            "Authorization": `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ action: "door_test" }),
+        });
+
+        await new Promise((r) => setTimeout(r, 2000));
+        const res = await fetch(
+          `${PUBSUB_BASE}/subscribe?topic=${encodeURIComponent(podId)}&num_records=1`,
+          {
+            method: "GET",
+            headers: {
+              "accept": "application/json",
+              "Authorization": `Bearer ${accessToken}`,
+            },
+          }
+        );
+        const data = await res.json();
+        const record = Array.isArray(data) ? data[0] : data;
+        const test = record?.Test || record?.test || record?.action || "door_test";
+        const test_status = record?.Test_Status || record?.test_status || record?.status || "Unknown";
+        setTestResult({ test, test_status });
+
+        if (test_status.toLowerCase() === "failed") {
+          toast.error("Door test failed. Please try again.");
+          setStatus((prev) => ({ ...prev, [key]: "failed" }));
+        } else {
+          setStatus((prev) => ({ ...prev, [key]: "success" }));
+        }
+      } catch {
+        toast.error("Door test failed");
+        setStatus((prev) => ({ ...prev, [key]: "failed" }));
+      }
     } else {
       // Simulate other tests for now
       await new Promise((r) => setTimeout(r, 1200));
@@ -149,6 +188,7 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
             const config = testConfig[key];
             const Icon = config.icon;
             const isSuccess = status[key] === "success";
+            const isFailed = status[key] === "failed";
             const isRunning = running === key;
 
             return (
@@ -159,6 +199,8 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
                   "flex items-center justify-between border border-border rounded-xl px-5 py-4 cursor-pointer transition-all",
                   isSuccess
                     ? "bg-primary/10 border-primary/30"
+                    : isFailed
+                    ? "bg-destructive/10 border-destructive/30"
                     : "hover:bg-muted/50",
                   (isSuccess || (running !== null && !isRunning)) && "pointer-events-none"
                 )}
@@ -174,12 +216,14 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
                     "text-base font-medium",
                     isSuccess ? "text-foreground" : "text-foreground"
                   )}>
-                    {isRunning ? `Testing ${config.label}...` : config.label}
+                    {isRunning ? `Testing ${config.label}...` : isFailed ? `${config.label} - Failed, try again` : config.label}
                   </span>
                 </div>
                 <div>
                   {isSuccess ? (
                     <CheckCircle2 className="h-7 w-7 text-green-600" />
+                  ) : isFailed ? (
+                    <XCircle className="h-7 w-7 text-destructive" />
                   ) : (
                     <span className="h-7 w-7 inline-block rounded-full border-2 border-muted-foreground/30" />
                   )}
