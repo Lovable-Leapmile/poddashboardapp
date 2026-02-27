@@ -82,8 +82,8 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
         const record = Array.isArray(data) ? data[0] : data;
         const test = record?.Test || record?.test || record?.action || "buzzer_test";
         const test_status = record?.Test_Status || record?.test_status || record?.status || "Unknown";
-        setTestResult({ test, test_status });
         if (test_status.toLowerCase() === "completed") {
+          setTestResult({ test, test_status });
           setStatus((prev) => ({ ...prev, [key]: "success" }));
         } else {
           toast.error("Buzzer test failed. Please try again.");
@@ -121,9 +121,8 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
         const test = record?.Test || record?.test || record?.action || "door_test";
         const test_status = record?.Test_Status || record?.test_status || record?.status || "Unknown";
         const doors_failed = record?.doors_failed ?? record?.Doors_Failed ?? undefined;
-        setTestResult({ test, test_status, doors_failed: doors_failed != null ? Number(doors_failed) : undefined });
-
         if (test_status.toLowerCase() === "completed") {
+          setTestResult({ test, test_status, doors_failed: doors_failed != null ? Number(doors_failed) : undefined });
           setStatus((prev) => ({ ...prev, [key]: "success" }));
         } else {
           toast.error("Door test failed. Please try again.");
@@ -160,8 +159,8 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
         const record = Array.isArray(data) ? data[0] : data;
         const test = record?.Test || record?.test || record?.action || "bay_door_test";
         const test_status = record?.Test_Status || record?.test_status || record?.status || "Unknown";
-        setTestResult({ test, test_status });
         if (test_status.toLowerCase() === "completed") {
+          setTestResult({ test, test_status });
           setStatus((prev) => ({ ...prev, [key]: "success" }));
         } else {
           toast.error("Bay Door test failed. Please try again.");
