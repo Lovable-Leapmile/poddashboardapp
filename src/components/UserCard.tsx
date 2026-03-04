@@ -30,9 +30,9 @@ const UserCard: React.FC<UserCardProps> = ({ user, onUserClick }) => {
             variant="ghost"
             size="sm"
             onClick={() => onUserClick(user.id)}
-            className="h-8 w-8 p-0 hover:bg-[#FDDC4E]/20 hover:text-gray-900 transition-colors shrink-0 ml-2"
+            className="h-7 px-3 text-xs font-medium hover:bg-[#FDDC4E]/20 hover:text-gray-900 transition-colors shrink-0 ml-2"
           >
-            <Eye className="h-4 w-4" />
+            View
           </Button>
         </div>
       </CardContent>
