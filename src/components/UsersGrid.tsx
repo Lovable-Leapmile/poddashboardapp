@@ -160,9 +160,9 @@ const UsersGrid: React.FC<UsersGridProps> = ({ users, loading, searchText, pageS
                     variant="ghost"
                     size="sm"
                     onClick={() => onUserClick(user.id)}
-                    className="h-8 w-8 p-0 hover:bg-[#FDDC4E]/20 hover:text-gray-900 transition-colors"
+                    className="h-7 px-3 text-xs font-medium hover:bg-[#FDDC4E]/20 hover:text-gray-900 transition-colors"
                   >
-                    <Eye className="h-4 w-4" />
+                    View
                   </Button>
                 </TableCell>
               </TableRow>

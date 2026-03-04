@@ -41,10 +41,9 @@ const ActionCellRenderer: React.FC<{
         e.stopPropagation();
         onUserClick(data.id);
       }}
-      className="h-8 w-8 p-0 transition-colors bg-gray-100 text-gray-600 hover:text-gray-800 hover:bg-[#FDDC4E] hover:text-black"
-      title="View User Details"
+      className="h-7 px-3 text-xs font-medium bg-gray-100 text-gray-600 hover:bg-[#FDDC4E] hover:text-black transition-colors"
     >
-      <Eye className="h-4 w-4" />
+      View
     </Button>
   </div>
 );
@@ -298,9 +297,9 @@ const UsersAgGrid: React.FC<UsersAgGridProps> = ({ users, loading, onBack, onUse
                             e.stopPropagation();
                             onUserClick(user.id);
                           }}
-                          className="h-8 w-8 p-0 transition-colors bg-gray-100 text-gray-600 hover:text-gray-800 hover:bg-[#FDDC4E] hover:text-black"
+                          className="h-7 px-3 text-xs font-medium transition-colors bg-gray-100 text-gray-600 hover:text-black hover:bg-[#FDDC4E]"
                         >
-                          <Eye className="h-4 w-4" />
+                          View
                         </Button>
                       </div>
                       <div className="space-y-2">
