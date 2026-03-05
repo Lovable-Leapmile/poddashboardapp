@@ -42,6 +42,54 @@ const initialStatus: TestStatus = {
 };
 
 const PUBSUB_BASE = "https://rakeshlocalhost.leapmile.com/pubsub";
+const POLL_INTERVAL_MS = 2000;
+const MAX_POLL_ATTEMPTS = 20;
+
+const TEST_ACTIONS: Record<TestKey, string> = {
+  buzzer: "buzzer_test",
+  doors: "door_test",
+  bay_door: "bay_door_test",
+  ups: "ups_test",
+  network_speed: "network_test",
+};
+
+const TEST_ALIASES: Record<TestKey, string[]> = {
+  buzzer: ["buzzer", "buzzer_test"],
+  doors: ["door", "doors", "door_test", "doors_test"],
+  bay_door: ["bay_door", "baydoor", "bay_door_test", "bay door"],
+  ups: ["ups", "ups_test"],
+  network_speed: ["network", "network_speed", "network_test", "network speed"],
+};
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const normalize = (value: unknown) =>
+  String(value ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+
+interface ParsedTestRecord {
+  test: string;
+  test_status: string;
+  doors_failed?: number;
+  signature: string;
+}
+
+const parseTestRecord = (record: any): ParsedTestRecord => {
+  const rawDoorsFailed = record?.doors_failed ?? record?.Doors_Failed ?? record?.doorsFailed;
+
+  return {
+    test: String(record?.Test ?? record?.test ?? record?.action ?? ""),
+    test_status: String(record?.Test_Status ?? record?.test_status ?? record?.status ?? ""),
+    doors_failed: rawDoorsFailed != null ? Number(rawDoorsFailed) : undefined,
+    signature: JSON.stringify(record ?? {}),
+  };
+};
+
+const isExpectedTestRecord = (key: TestKey, testName: string) => {
+  const normalizedTestName = normalize(testName);
+  return TEST_ALIASES[key].some((alias) => normalizedTestName.includes(normalize(alias)));
+};
 
 const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId }) => {
   const { accessToken } = useAuth();
@@ -51,266 +99,142 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
     null,
   );
 
-  const handleTest = async (key: TestKey) => {
-    if (status[key] === "success" || running !== null) return;
-    setRunning(key);
+  const fetchSubscribeRecords = async (numRecords = 5): Promise<ParsedTestRecord[]> => {
+    const res = await fetch(`${PUBSUB_BASE}/subscribe?topic=${encodeURIComponent(podId)}&num_records=${numRecords}`, {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
 
-    if (key === "buzzer") {
-      try {
-        await fetch(`${PUBSUB_BASE}/publish?topic=${encodeURIComponent(podId)}`, {
-          method: "POST",
-          headers: {
-            accept: "application/json",
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ action: "buzzer_test" }),
-        });
-
-        // Poll subscribe API up to 10 times with 5s intervals
-        let completed = false;
-        let lastStatus = "";
-        for (let attempt = 0; attempt < 10; attempt++) {
-          await new Promise((r) => setTimeout(r, 5000));
-          const res = await fetch(`${PUBSUB_BASE}/subscribe?topic=${encodeURIComponent(podId)}&num_records=1`, {
-            method: "GET",
-            headers: {
-              accept: "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-          });
-          const data = await res.json();
-          const record = Array.isArray(data) ? data[0] : data;
-          const test = record?.Test || record?.test || record?.action || "buzzer_test";
-          const test_status = record?.Test_Status || record?.test_status || record?.status || "";
-          lastStatus = test_status;
-          if (test_status.toLowerCase() === "completed") {
-            toast.success(`Buzzer: ${test_status}`);
-            setTestResult({ test, test_status });
-            setStatus((prev) => ({ ...prev, [key]: "success" }));
-            completed = true;
-            break;
-          } else if (test_status.toLowerCase() === "failed") {
-            toast.error(`Buzzer: ${test_status}`);
-            setStatus((prev) => ({ ...prev, [key]: "failed" }));
-            completed = true;
-            break;
-          }
-        }
-        if (!completed) {
-          toast.error(`Buzzer: ${lastStatus || "Timed out"}`);
-          setStatus((prev) => ({ ...prev, [key]: "failed" }));
-        }
-      } catch {
-        toast.error("Buzzer test failed");
-        setStatus((prev) => ({ ...prev, [key]: "failed" }));
-      }
-    } else if (key === "doors") {
-      try {
-        await fetch(`${PUBSUB_BASE}/publish?topic=${encodeURIComponent(podId)}`, {
-          method: "POST",
-          headers: {
-            accept: "application/json",
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ action: "door_test" }),
-        });
-
-        // Poll subscribe API up to 10 times with 5s intervals
-        let completed = false;
-        let lastStatus = "";
-        for (let attempt = 0; attempt < 10; attempt++) {
-          await new Promise((r) => setTimeout(r, 5000));
-          const res = await fetch(`${PUBSUB_BASE}/subscribe?topic=${encodeURIComponent(podId)}&num_records=1`, {
-            method: "GET",
-            headers: {
-              accept: "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-          });
-          const data = await res.json();
-          const record = Array.isArray(data) ? data[0] : data;
-          const test = record?.Test || record?.test || record?.action || "door_test";
-          const test_status = record?.Test_Status || record?.test_status || record?.status || "";
-          const doors_failed = record?.doors_failed ?? record?.Doors_Failed ?? undefined;
-          lastStatus = test_status;
-          if (test_status.toLowerCase() === "completed") {
-            toast.success(`Doors: ${test_status}`);
-            toast.info("Please close the opened door.", { duration: 6000 });
-            setTestResult({ test, test_status, doors_failed: doors_failed != null ? Number(doors_failed) : undefined });
-            setStatus((prev) => ({ ...prev, [key]: "success" }));
-            completed = true;
-            break;
-          } else if (test_status.toLowerCase() === "failed") {
-            toast.error(`Doors: ${test_status}`);
-            setStatus((prev) => ({ ...prev, [key]: "failed" }));
-            completed = true;
-            break;
-          }
-        }
-        if (!completed) {
-          toast.error(`Doors: ${lastStatus || "Timed out"}`);
-          setStatus((prev) => ({ ...prev, [key]: "failed" }));
-        }
-      } catch {
-        toast.error("Door test failed");
-        setStatus((prev) => ({ ...prev, [key]: "failed" }));
-      }
-    } else if (key === "bay_door") {
-      try {
-        await fetch(`${PUBSUB_BASE}/publish?topic=${encodeURIComponent(podId)}`, {
-          method: "POST",
-          headers: {
-            accept: "application/json",
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ action: "bay_door_test" }),
-        });
-
-        // Poll subscribe API up to 10 times with 5s intervals
-        let completed = false;
-        let lastStatus = "";
-        for (let attempt = 0; attempt < 10; attempt++) {
-          await new Promise((r) => setTimeout(r, 5000));
-          const res = await fetch(`${PUBSUB_BASE}/subscribe?topic=${encodeURIComponent(podId)}&num_records=1`, {
-            method: "GET",
-            headers: {
-              accept: "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-          });
-          const data = await res.json();
-          const record = Array.isArray(data) ? data[0] : data;
-          const test = record?.Test || record?.test || record?.action || "bay_door_test";
-          const test_status = record?.Test_Status || record?.test_status || record?.status || "";
-          lastStatus = test_status;
-          if (test_status.toLowerCase() === "completed") {
-            toast.success(`Bay Door: ${test_status}`);
-            setTestResult({ test, test_status });
-            setStatus((prev) => ({ ...prev, [key]: "success" }));
-            completed = true;
-            break;
-          } else if (test_status.toLowerCase() === "failed") {
-            toast.error(`Bay Door: ${test_status}`);
-            setStatus((prev) => ({ ...prev, [key]: "failed" }));
-            completed = true;
-            break;
-          }
-        }
-        if (!completed) {
-          toast.error(`Bay Door: ${lastStatus || "Timed out"}`);
-          setStatus((prev) => ({ ...prev, [key]: "failed" }));
-        }
-      } catch {
-        toast.error("Bay Door test failed");
-        setStatus((prev) => ({ ...prev, [key]: "failed" }));
-      }
-    } else if (key === "ups") {
-      try {
-        await fetch(`${PUBSUB_BASE}/publish?topic=${encodeURIComponent(podId)}`, {
-          method: "POST",
-          headers: {
-            accept: "application/json",
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ action: "ups_test" }),
-        });
-
-        toast.info("If the pod is in raw mode, please plug out the power.", { duration: 8000 });
-
-        // Poll subscribe API up to 10 times with 5s intervals
-        let completed = false;
-        let lastStatus = "";
-        for (let attempt = 0; attempt < 10; attempt++) {
-          await new Promise((r) => setTimeout(r, 5000));
-          const res = await fetch(`${PUBSUB_BASE}/subscribe?topic=${encodeURIComponent(podId)}&num_records=1`, {
-            method: "GET",
-            headers: {
-              accept: "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-          });
-          const data = await res.json();
-          const record = Array.isArray(data) ? data[0] : data;
-          const test = record?.Test || record?.test || record?.action || "ups_test";
-          const test_status = record?.Test_Status || record?.test_status || record?.status || "";
-          lastStatus = test_status;
-          if (test_status.toLowerCase() === "completed") {
-            toast.success(`UPS: ${test_status}`);
-            setTestResult({ test, test_status });
-            setStatus((prev) => ({ ...prev, [key]: "success" }));
-            completed = true;
-            break;
-          } else if (test_status.toLowerCase() === "failed") {
-            toast.error(`UPS: ${test_status}`);
-            setStatus((prev) => ({ ...prev, [key]: "failed" }));
-            completed = true;
-            break;
-          }
-        }
-        if (!completed) {
-          toast.error(`UPS: ${lastStatus || "Timed out"}`);
-          setStatus((prev) => ({ ...prev, [key]: "failed" }));
-        }
-      } catch {
-        toast.error("UPS test failed");
-        setStatus((prev) => ({ ...prev, [key]: "failed" }));
-      }
-    } else if (key === "network_speed") {
-      try {
-        await fetch(`${PUBSUB_BASE}/publish?topic=${encodeURIComponent(podId)}`, {
-          method: "POST",
-          headers: {
-            accept: "application/json",
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ action: "network_test" }),
-        });
-
-        let completed = false;
-        let lastStatus = "";
-        for (let attempt = 0; attempt < 10; attempt++) {
-          await new Promise((r) => setTimeout(r, 5000));
-          const res = await fetch(`${PUBSUB_BASE}/subscribe?topic=${encodeURIComponent(podId)}&num_records=1`, {
-            method: "GET",
-            headers: {
-              accept: "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-          });
-          const data = await res.json();
-          const record = Array.isArray(data) ? data[0] : data;
-          const test = record?.Test || record?.test || record?.action || "network_test";
-          const test_status = record?.Test_Status || record?.test_status || record?.status || "";
-          lastStatus = test_status;
-          if (test_status.toLowerCase() === "completed") {
-            toast.success(`Network Speed: ${test_status}`);
-            setTestResult({ test, test_status });
-            setStatus((prev) => ({ ...prev, [key]: "success" }));
-            completed = true;
-            break;
-          } else if (test_status.toLowerCase() === "failed") {
-            toast.error(`Network Speed: ${test_status}`);
-            setStatus((prev) => ({ ...prev, [key]: "failed" }));
-            completed = true;
-            break;
-          }
-        }
-        if (!completed) {
-          toast.error(`Network Speed: ${lastStatus || "Timed out"}`);
-          setStatus((prev) => ({ ...prev, [key]: "failed" }));
-        }
-      } catch {
-        toast.error("Network Speed test failed");
-        setStatus((prev) => ({ ...prev, [key]: "failed" }));
-      }
+    if (!res.ok) {
+      throw new Error("Unable to fetch test records");
     }
 
-    setRunning(null);
+    const data = await res.json();
+    const records = Array.isArray(data) ? data : [data];
+    return records.filter(Boolean).map(parseTestRecord);
+  };
+
+  const runTestFlow = async ({
+    key,
+    label,
+    publishInfo,
+    completedInfo,
+    includeDoorsFailed,
+  }: {
+    key: TestKey;
+    label: string;
+    publishInfo?: { message: string; duration?: number };
+    completedInfo?: { message: string; duration?: number };
+    includeDoorsFailed?: boolean;
+  }) => {
+    const action = TEST_ACTIONS[key];
+
+    const baselineRecords = await fetchSubscribeRecords(5);
+    const baselineSignature =
+      baselineRecords.find((record) => isExpectedTestRecord(key, record.test))?.signature ?? null;
+
+    const publishRes = await fetch(`${PUBSUB_BASE}/publish?topic=${encodeURIComponent(podId)}`, {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ action }),
+    });
+
+    if (!publishRes.ok) {
+      throw new Error("Unable to publish test action");
+    }
+
+    if (publishInfo) {
+      toast.info(publishInfo.message, { duration: publishInfo.duration ?? 5000 });
+    }
+
+    for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
+      await sleep(POLL_INTERVAL_MS);
+
+      let records: ParsedTestRecord[] = [];
+      try {
+        records = await fetchSubscribeRecords(5);
+      } catch {
+        continue;
+      }
+
+      const terminalRecord = records.find((record) => {
+        if (!isExpectedTestRecord(key, record.test)) return false;
+        if (baselineSignature && record.signature === baselineSignature) return false;
+
+        const normalizedStatus = record.test_status.trim().toLowerCase();
+        return normalizedStatus === "completed" || normalizedStatus === "failed";
+      });
+
+      if (!terminalRecord) {
+        continue;
+      }
+
+      const normalizedStatus = terminalRecord.test_status.trim().toLowerCase();
+
+      if (normalizedStatus === "completed") {
+        toast.success(`${label}: ${terminalRecord.test_status}`);
+        if (completedInfo) {
+          toast.info(completedInfo.message, { duration: completedInfo.duration ?? 6000 });
+        }
+
+        setTestResult({
+          test: terminalRecord.test || action,
+          test_status: terminalRecord.test_status,
+          ...(includeDoorsFailed ? { doors_failed: terminalRecord.doors_failed } : {}),
+        });
+        setStatus((prev) => ({ ...prev, [key]: "success" }));
+        return;
+      }
+
+      toast.error(`${label}: ${terminalRecord.test_status || "Failed"}`);
+      setStatus((prev) => ({ ...prev, [key]: "failed" }));
+      return;
+    }
+
+    toast.error(`${label}: Timed out`);
+    setStatus((prev) => ({ ...prev, [key]: "failed" }));
+  };
+
+  const handleTest = async (key: TestKey) => {
+    if (status[key] === "success" || running !== null) return;
+
+    setRunning(key);
+    setTestResult(null);
+
+    try {
+      if (key === "buzzer") {
+        await runTestFlow({ key, label: "Buzzer" });
+      } else if (key === "doors") {
+        await runTestFlow({
+          key,
+          label: "Doors",
+          completedInfo: { message: "Please close the opened door.", duration: 6000 },
+          includeDoorsFailed: true,
+        });
+      } else if (key === "bay_door") {
+        await runTestFlow({ key, label: "Bay Door" });
+      } else if (key === "ups") {
+        await runTestFlow({
+          key,
+          label: "UPS",
+          publishInfo: { message: "If the pod is in raw mode, please plug out the power.", duration: 8000 },
+        });
+      } else if (key === "network_speed") {
+        await runTestFlow({ key, label: "Network Speed" });
+      }
+    } catch {
+      toast.error(`${testConfig[key].label} test failed`);
+      setStatus((prev) => ({ ...prev, [key]: "failed" }));
+    } finally {
+      setRunning(null);
+    }
   };
 
   const completedCount = testKeys.filter((k) => status[k] === "success").length;
