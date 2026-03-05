@@ -75,13 +75,64 @@ interface ParsedTestRecord {
   signature: string;
 }
 
+const toObject = (value: unknown): Record<string, unknown> | null => {
+  if (!value) return null;
+
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      return parsed && typeof parsed === "object" ? (parsed as Record<string, unknown>) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  return typeof value === "object" ? (value as Record<string, unknown>) : null;
+};
+
+const getFieldValue = (source: Record<string, unknown> | null, aliases: string[]) => {
+  if (!source) return undefined;
+
+  const normalizedEntries = new Map(
+    Object.entries(source).map(([key, value]) => [normalize(key), value]),
+  );
+
+  for (const alias of aliases) {
+    const value = normalizedEntries.get(normalize(alias));
+    if (value !== undefined && value !== null && String(value).trim() !== "") {
+      return value;
+    }
+  }
+
+  return undefined;
+};
+
 const parseTestRecord = (record: any): ParsedTestRecord => {
-  const rawDoorsFailed = record?.doors_failed ?? record?.Doors_Failed ?? record?.doorsFailed;
+  const root = toObject(record);
+  const nestedMessage = toObject(root?.message);
+  const nestedPayload = toObject(root?.payload) ?? toObject(root?.data) ?? toObject(root?.body);
+
+  const candidates = [root, nestedMessage, nestedPayload];
+
+  const test =
+    candidates
+      .map((candidate) => getFieldValue(candidate, ["Test", "test", "action", "test_name", "test type"]))
+      .find((value) => value !== undefined) ?? "";
+
+  const testStatus =
+    candidates
+      .map((candidate) => getFieldValue(candidate, ["Test_Status", "test_status", "status", "test status"]))
+      .find((value) => value !== undefined) ?? "";
+
+  const doorsFailed =
+    candidates
+      .map((candidate) => getFieldValue(candidate, ["doors_failed", "Doors_Failed", "doorsFailed", "doors failed"]))
+      .find((value) => value !== undefined);
 
   return {
-    test: String(record?.Test ?? record?.test ?? record?.action ?? ""),
-    test_status: String(record?.Test_Status ?? record?.test_status ?? record?.status ?? ""),
-    doors_failed: rawDoorsFailed != null ? Number(rawDoorsFailed) : undefined,
+    test: String(test),
+    test_status: String(testStatus),
+    doors_failed: doorsFailed != null ? Number(doorsFailed) : undefined,
     signature: JSON.stringify(record ?? {}),
   };
 };
@@ -113,7 +164,16 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
     }
 
     const data = await res.json();
-    const records = Array.isArray(data) ? data : [data];
+    const records = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.records)
+        ? data.records
+        : Array.isArray(data?.data)
+          ? data.data
+          : data
+            ? [data]
+            : [];
+
     return records.filter(Boolean).map(parseTestRecord);
   };
 
@@ -165,11 +225,17 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
       }
 
       const terminalRecord = records.find((record) => {
-        if (!isExpectedTestRecord(key, record.test)) return false;
+        const hasTerminalStatus = ["completed", "failed"].includes(record.test_status.trim().toLowerCase());
+        if (!hasTerminalStatus) return false;
+
+        const matchesCurrentTest =
+          isExpectedTestRecord(key, record.test) ||
+          (!record.test.trim() && record.test_status.trim().length > 0);
+        if (!matchesCurrentTest) return false;
+
         if (baselineSignature && record.signature === baselineSignature) return false;
 
-        const normalizedStatus = record.test_status.trim().toLowerCase();
-        return normalizedStatus === "completed" || normalizedStatus === "failed";
+        return true;
       });
 
       if (!terminalRecord) {
