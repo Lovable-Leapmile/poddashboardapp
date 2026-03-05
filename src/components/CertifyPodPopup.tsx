@@ -69,6 +69,7 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
 
         // Poll subscribe API up to 10 times with 5s intervals
         let completed = false;
+        let lastStatus = "";
         for (let attempt = 0; attempt < 10; attempt++) {
           await new Promise((r) => setTimeout(r, 5000));
           const res = await fetch(`${PUBSUB_BASE}/subscribe?topic=${encodeURIComponent(podId)}&num_records=1`, {
@@ -83,14 +84,17 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
           const test = record?.Test || record?.test || record?.action || "buzzer_test";
           const test_status = record?.Test_Status || record?.test_status || record?.status || "";
           if (test_status.toLowerCase() === "completed") {
+            toast.success(`Buzzer: ${test_status}`);
             setTestResult({ test, test_status });
             setStatus((prev) => ({ ...prev, [key]: "success" }));
             completed = true;
+            lastStatus = test_status;
             break;
           }
+          lastStatus = test_status;
         }
         if (!completed) {
-          toast.error("Buzzer test failed. Please try again.");
+          toast.error(`Buzzer: ${lastStatus || "Timed out"}`);
           setStatus((prev) => ({ ...prev, [key]: "failed" }));
         }
       } catch {
@@ -111,6 +115,7 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
 
         // Poll subscribe API up to 10 times with 5s intervals
         let completed = false;
+        let lastStatus = "";
         for (let attempt = 0; attempt < 10; attempt++) {
           await new Promise((r) => setTimeout(r, 5000));
           const res = await fetch(`${PUBSUB_BASE}/subscribe?topic=${encodeURIComponent(podId)}&num_records=1`, {
@@ -126,14 +131,17 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
           const test_status = record?.Test_Status || record?.test_status || record?.status || "";
           const doors_failed = record?.doors_failed ?? record?.Doors_Failed ?? undefined;
           if (test_status.toLowerCase() === "completed") {
+            toast.success(`Doors: ${test_status}`);
             setTestResult({ test, test_status, doors_failed: doors_failed != null ? Number(doors_failed) : undefined });
             setStatus((prev) => ({ ...prev, [key]: "success" }));
             completed = true;
+            lastStatus = test_status;
             break;
           }
+          lastStatus = test_status;
         }
         if (!completed) {
-          toast.error("Door test failed. Please try again.");
+          toast.error(`Doors: ${lastStatus || "Timed out"}`);
           setStatus((prev) => ({ ...prev, [key]: "failed" }));
         }
       } catch {
@@ -154,6 +162,7 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
 
         // Poll subscribe API up to 10 times with 5s intervals
         let completed = false;
+        let lastStatus = "";
         for (let attempt = 0; attempt < 10; attempt++) {
           await new Promise((r) => setTimeout(r, 5000));
           const res = await fetch(`${PUBSUB_BASE}/subscribe?topic=${encodeURIComponent(podId)}&num_records=1`, {
@@ -168,14 +177,17 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
           const test = record?.Test || record?.test || record?.action || "bay_door_test";
           const test_status = record?.Test_Status || record?.test_status || record?.status || "";
           if (test_status.toLowerCase() === "completed") {
+            toast.success(`Bay Door: ${test_status}`);
             setTestResult({ test, test_status });
             setStatus((prev) => ({ ...prev, [key]: "success" }));
             completed = true;
+            lastStatus = test_status;
             break;
           }
+          lastStatus = test_status;
         }
         if (!completed) {
-          toast.error("Bay Door test failed. Please try again.");
+          toast.error(`Bay Door: ${lastStatus || "Timed out"}`);
           setStatus((prev) => ({ ...prev, [key]: "failed" }));
         }
       } catch {
@@ -196,6 +208,7 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
 
         // Poll subscribe API up to 10 times with 5s intervals
         let completed = false;
+        let lastStatus = "";
         for (let attempt = 0; attempt < 10; attempt++) {
           await new Promise((r) => setTimeout(r, 5000));
           const res = await fetch(`${PUBSUB_BASE}/subscribe?topic=${encodeURIComponent(podId)}&num_records=1`, {
@@ -210,14 +223,17 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
           const test = record?.Test || record?.test || record?.action || "ups_test";
           const test_status = record?.Test_Status || record?.test_status || record?.status || "";
           if (test_status.toLowerCase() === "completed") {
+            toast.success(`UPS: ${test_status}`);
             setTestResult({ test, test_status });
             setStatus((prev) => ({ ...prev, [key]: "success" }));
             completed = true;
+            lastStatus = test_status;
             break;
           }
+          lastStatus = test_status;
         }
         if (!completed) {
-          toast.error("UPS test failed. Please try again.");
+          toast.error(`UPS: ${lastStatus || "Timed out"}`);
           setStatus((prev) => ({ ...prev, [key]: "failed" }));
         }
       } catch {
@@ -237,6 +253,7 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
         });
 
         let completed = false;
+        let lastStatus = "";
         for (let attempt = 0; attempt < 10; attempt++) {
           await new Promise((r) => setTimeout(r, 5000));
           const res = await fetch(`${PUBSUB_BASE}/subscribe?topic=${encodeURIComponent(podId)}&num_records=1`, {
@@ -251,14 +268,17 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
           const test = record?.Test || record?.test || record?.action || "network_test";
           const test_status = record?.Test_Status || record?.test_status || record?.status || "";
           if (test_status.toLowerCase() === "completed") {
+            toast.success(`Network Speed: ${test_status}`);
             setTestResult({ test, test_status });
             setStatus((prev) => ({ ...prev, [key]: "success" }));
             completed = true;
+            lastStatus = test_status;
             break;
           }
+          lastStatus = test_status;
         }
         if (!completed) {
-          toast.error("Network Speed test failed. Please try again.");
+          toast.error(`Network Speed: ${lastStatus || "Timed out"}`);
           setStatus((prev) => ({ ...prev, [key]: "failed" }));
         }
       } catch {
