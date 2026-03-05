@@ -132,6 +132,7 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
           const doors_failed = record?.doors_failed ?? record?.Doors_Failed ?? undefined;
           if (test_status.toLowerCase() === "completed") {
             toast.success(`Doors: ${test_status}`);
+            toast.info("Please close the opened door.", { duration: 6000 });
             setTestResult({ test, test_status, doors_failed: doors_failed != null ? Number(doors_failed) : undefined });
             setStatus((prev) => ({ ...prev, [key]: "success" }));
             completed = true;
@@ -205,6 +206,8 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
           },
           body: JSON.stringify({ action: "ups_test" }),
         });
+
+        toast.info("If the pod is in raw mode, please plug out the power.", { duration: 8000 });
 
         // Poll subscribe API up to 10 times with 5s intervals
         let completed = false;
