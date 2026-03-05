@@ -41,13 +41,15 @@ const initialStatus: TestStatus = {
   network_speed: "idle",
 };
 
-const PUBSUB_BASE = "https://rakesh.leapmile.com/pubsub";
+const PUBSUB_BASE = "https://rakeshlocalhost.leapmile.com/pubsub";
 
 const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId }) => {
   const { accessToken } = useAuth();
   const [status, setStatus] = useState<TestStatus>({ ...initialStatus });
   const [running, setRunning] = useState<TestKey | null>(null);
-  const [testResult, setTestResult] = useState<{ test: string; test_status: string; doors_failed?: number } | null>(null);
+  const [testResult, setTestResult] = useState<{ test: string; test_status: string; doors_failed?: number } | null>(
+    null,
+  );
 
   const handleTest = async (key: TestKey) => {
     if (status[key] === "success" || running !== null) return;
@@ -59,8 +61,8 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
         await fetch(`${PUBSUB_BASE}/publish?topic=${encodeURIComponent(podId)}`, {
           method: "POST",
           headers: {
-            "accept": "application/json",
-            "Authorization": `Bearer ${accessToken}`,
+            accept: "application/json",
+            Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ action: "buzzer_test" }),
@@ -68,16 +70,13 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
 
         // Wait a moment then GET result
         await new Promise((r) => setTimeout(r, 2000));
-        const res = await fetch(
-          `${PUBSUB_BASE}/subscribe?topic=${encodeURIComponent(podId)}&num_records=1`,
-          {
-            method: "GET",
-            headers: {
-              "accept": "application/json",
-              "Authorization": `Bearer ${accessToken}`,
-            },
-          }
-        );
+        const res = await fetch(`${PUBSUB_BASE}/subscribe?topic=${encodeURIComponent(podId)}&num_records=1`, {
+          method: "GET",
+          headers: {
+            accept: "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
         const data = await res.json();
         const record = Array.isArray(data) ? data[0] : data;
         const test = record?.Test || record?.test || record?.action || "buzzer_test";
@@ -98,24 +97,21 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
         await fetch(`${PUBSUB_BASE}/publish?topic=${encodeURIComponent(podId)}`, {
           method: "POST",
           headers: {
-            "accept": "application/json",
-            "Authorization": `Bearer ${accessToken}`,
+            accept: "application/json",
+            Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ action: "door_test" }),
         });
 
         await new Promise((r) => setTimeout(r, 2000));
-        const res = await fetch(
-          `${PUBSUB_BASE}/subscribe?topic=${encodeURIComponent(podId)}&num_records=1`,
-          {
-            method: "GET",
-            headers: {
-              "accept": "application/json",
-              "Authorization": `Bearer ${accessToken}`,
-            },
-          }
-        );
+        const res = await fetch(`${PUBSUB_BASE}/subscribe?topic=${encodeURIComponent(podId)}&num_records=1`, {
+          method: "GET",
+          headers: {
+            accept: "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
         const data = await res.json();
         const record = Array.isArray(data) ? data[0] : data;
         const test = record?.Test || record?.test || record?.action || "door_test";
@@ -137,24 +133,21 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
         await fetch(`${PUBSUB_BASE}/publish?topic=${encodeURIComponent(podId)}`, {
           method: "POST",
           headers: {
-            "accept": "application/json",
-            "Authorization": `Bearer ${accessToken}`,
+            accept: "application/json",
+            Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ action: "bay_door_test" }),
         });
 
         await new Promise((r) => setTimeout(r, 2000));
-        const res = await fetch(
-          `${PUBSUB_BASE}/subscribe?topic=${encodeURIComponent(podId)}&num_records=1`,
-          {
-            method: "GET",
-            headers: {
-              "accept": "application/json",
-              "Authorization": `Bearer ${accessToken}`,
-            },
-          }
-        );
+        const res = await fetch(`${PUBSUB_BASE}/subscribe?topic=${encodeURIComponent(podId)}&num_records=1`, {
+          method: "GET",
+          headers: {
+            accept: "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
         const data = await res.json();
         const record = Array.isArray(data) ? data[0] : data;
         const test = record?.Test || record?.test || record?.action || "bay_door_test";
@@ -243,23 +236,21 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
                   isSuccess
                     ? "bg-primary/10 border-primary/30"
                     : isFailed
-                    ? "bg-destructive/10 border-destructive/30"
-                    : "hover:bg-muted/50",
-                  (isSuccess || (running !== null && !isRunning)) && "pointer-events-none"
+                      ? "bg-destructive/10 border-destructive/30"
+                      : "hover:bg-muted/50",
+                  (isSuccess || (running !== null && !isRunning)) && "pointer-events-none",
                 )}
               >
                 <div className="flex items-center gap-4">
-                  <div className={cn(
-                    "h-10 w-10 rounded-lg flex items-center justify-center",
-                    config.bgColor
-                  )}>
+                  <div className={cn("h-10 w-10 rounded-lg flex items-center justify-center", config.bgColor)}>
                     <Icon className={cn("h-5 w-5", config.iconColor)} />
                   </div>
-                  <span className={cn(
-                    "text-base font-medium",
-                    isSuccess ? "text-foreground" : "text-foreground"
-                  )}>
-                    {isRunning ? `Testing ${config.label}...` : isFailed ? `${config.label} - Failed, try again` : config.label}
+                  <span className={cn("text-base font-medium", isSuccess ? "text-foreground" : "text-foreground")}>
+                    {isRunning
+                      ? `Testing ${config.label}...`
+                      : isFailed
+                        ? `${config.label} - Failed, try again`
+                        : config.label}
                   </span>
                 </div>
                 <div>
@@ -277,19 +268,35 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
         </div>
 
         {/* Test Result Dialog */}
-        <Dialog open={!!testResult} onOpenChange={(o) => { if (!o) setTestResult(null); }}>
+        <Dialog
+          open={!!testResult}
+          onOpenChange={(o) => {
+            if (!o) setTestResult(null);
+          }}
+        >
           <DialogContent className="sm:max-w-xs w-[80vw] p-6">
             <DialogHeader>
               <DialogTitle className="text-base font-bold">Test Result</DialogTitle>
             </DialogHeader>
             <div className="flex flex-col gap-2 text-sm mt-2">
-              <div><span className="font-semibold text-foreground">Test:</span> <span className="text-muted-foreground">{testResult?.test}</span></div>
-              <div><span className="font-semibold text-foreground">Status:</span> <span className="text-muted-foreground">{testResult?.test_status}</span></div>
+              <div>
+                <span className="font-semibold text-foreground">Test:</span>{" "}
+                <span className="text-muted-foreground">{testResult?.test}</span>
+              </div>
+              <div>
+                <span className="font-semibold text-foreground">Status:</span>{" "}
+                <span className="text-muted-foreground">{testResult?.test_status}</span>
+              </div>
               {testResult?.doors_failed != null && (
-                <div><span className="font-semibold text-foreground">Doors Failed:</span> <span className="text-destructive font-medium">{testResult.doors_failed}</span></div>
+                <div>
+                  <span className="font-semibold text-foreground">Doors Failed:</span>{" "}
+                  <span className="text-destructive font-medium">{testResult.doors_failed}</span>
+                </div>
               )}
             </div>
-            <Button variant="outline" className="mt-4 w-full" onClick={() => setTestResult(null)}>Close</Button>
+            <Button variant="outline" className="mt-4 w-full" onClick={() => setTestResult(null)}>
+              Close
+            </Button>
           </DialogContent>
         </Dialog>
 
