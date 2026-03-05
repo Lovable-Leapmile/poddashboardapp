@@ -224,6 +224,22 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
         continue;
       }
 
+      // Check for intermediate status messages (e.g., "Please close the doors")
+      const intermediateRecord = records.find((record) => {
+        const status = record.test_status.trim().toLowerCase();
+        if (status === "completed" || status === "failed" || !status) return false;
+        const matchesTest =
+          isExpectedTestRecord(key, record.test) ||
+          (!record.test.trim() && record.test_status.trim().length > 0);
+        if (!matchesTest) return false;
+        if (baselineSignature && record.signature === baselineSignature) return false;
+        return true;
+      });
+
+      if (intermediateRecord) {
+        toast.info(`${label}: ${intermediateRecord.test_status}`, { duration: 4000 });
+      }
+
       const terminalRecord = records.find((record) => {
         const hasTerminalStatus = ["completed", "failed"].includes(record.test_status.trim().toLowerCase());
         if (!hasTerminalStatus) return false;
