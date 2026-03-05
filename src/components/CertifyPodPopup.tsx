@@ -224,10 +224,47 @@ const CertifyPodPopup: React.FC<CertifyPodPopupProps> = ({ open, onClose, podId 
         toast.error("UPS test failed");
         setStatus((prev) => ({ ...prev, [key]: "failed" }));
       }
-    } else {
-      // Simulate other tests for now
-      await new Promise((r) => setTimeout(r, 1200));
-      setStatus((prev) => ({ ...prev, [key]: "success" }));
+    } else if (key === "network_speed") {
+      try {
+        await fetch(`${PUBSUB_BASE}/publish?topic=${encodeURIComponent(podId)}`, {
+          method: "POST",
+          headers: {
+            accept: "application/json",
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ action: "network_test" }),
+        });
+
+        let completed = false;
+        for (let attempt = 0; attempt < 10; attempt++) {
+          await new Promise((r) => setTimeout(r, 5000));
+          const res = await fetch(`${PUBSUB_BASE}/subscribe?topic=${encodeURIComponent(podId)}&num_records=1`, {
+            method: "GET",
+            headers: {
+              accept: "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+          });
+          const data = await res.json();
+          const record = Array.isArray(data) ? data[0] : data;
+          const test = record?.Test || record?.test || record?.action || "network_test";
+          const test_status = record?.Test_Status || record?.test_status || record?.status || "";
+          if (test_status.toLowerCase() === "completed") {
+            setTestResult({ test, test_status });
+            setStatus((prev) => ({ ...prev, [key]: "success" }));
+            completed = true;
+            break;
+          }
+        }
+        if (!completed) {
+          toast.error("Network Speed test failed. Please try again.");
+          setStatus((prev) => ({ ...prev, [key]: "failed" }));
+        }
+      } catch {
+        toast.error("Network Speed test failed");
+        setStatus((prev) => ({ ...prev, [key]: "failed" }));
+      }
     }
 
     setRunning(null);
