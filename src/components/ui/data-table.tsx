@@ -52,6 +52,7 @@ export interface DataTableProps<T> {
   emptyTitle?: string;
   emptyDescription?: string;
   tableHeight?: string;
+  onRowClick?: (data: T) => void;
 }
 
 export function DataTable<T extends { id: number | string }>({
