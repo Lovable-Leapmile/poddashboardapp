@@ -205,8 +205,7 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
             <Button
               variant="destructive"
               className="rounded-lg text-xs md:text-sm h-8 px-2"
-              onClick={handleDeleteLocation}
-              disabled={deleting}
+              onClick={() => setShowDeletePopup(true)}
             >
               {deleting ? "Deleting..." : "Delete"}
             </Button>
