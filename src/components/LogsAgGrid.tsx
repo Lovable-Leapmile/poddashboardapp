@@ -36,7 +36,7 @@ const LogsAgGrid = () => {
   const [globalFilter, setGlobalFilter] = useState("");
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [pageSize, setPageSize] = useState(25);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const navigate = useNavigate();
   const fetchLogs = useCallback(async () => {
     if (!accessToken) return;
