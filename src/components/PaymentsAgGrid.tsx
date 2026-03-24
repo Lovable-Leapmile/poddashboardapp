@@ -38,7 +38,7 @@ const PaymentsAgGrid = () => {
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [showCreatePayment, setShowCreatePayment] = useState(false);
   const [pageSize, setPageSize] = useState(25);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const fetchPayments = useCallback(async () => {
     if (!accessToken) return;
     setLoading(true);

@@ -75,7 +75,7 @@ const NotificationsPage: React.FC = () => {
   const [emailGridApi, setEmailGridApi] = useState<GridApi | null>(null);
   const [searchText, setSearchText] = useState("");
   const [pageSize, setPageSize] = useState(25);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const navigate = useNavigate();
 
   // Settings state
