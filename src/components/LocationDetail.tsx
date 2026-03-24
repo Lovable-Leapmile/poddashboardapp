@@ -44,6 +44,7 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
   const [showCreateUserPopup, setShowCreateUserPopup] = useState(false);
   const [showPaymentModePopup, setShowPaymentModePopup] = useState(false);
   const [showEditLocationPopup, setShowEditLocationPopup] = useState(false);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   const fetchLocationDetail = async () => {
