@@ -11,6 +11,7 @@ import AssignFeBdPopup from "./AssignFeBdPopup";
 import CreateUserPopup from "./CreateUserPopup";
 import PaymentModePopup from "./PaymentModePopup";
 import EditLocationPopup from "./EditLocationPopup";
+import DeleteLocationPopup from "./DeleteLocationPopup";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useApiUrl } from "@/hooks/useApiUrl";
 import { useToast } from "@/hooks/use-toast";
