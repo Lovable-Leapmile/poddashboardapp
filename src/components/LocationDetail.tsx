@@ -11,6 +11,7 @@ import AssignFeBdPopup from "./AssignFeBdPopup";
 import CreateUserPopup from "./CreateUserPopup";
 import PaymentModePopup from "./PaymentModePopup";
 import EditLocationPopup from "./EditLocationPopup";
+import DeleteLocationPopup from "./DeleteLocationPopup";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useApiUrl } from "@/hooks/useApiUrl";
 import { useToast } from "@/hooks/use-toast";
@@ -43,6 +44,7 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
   const [showCreateUserPopup, setShowCreateUserPopup] = useState(false);
   const [showPaymentModePopup, setShowPaymentModePopup] = useState(false);
   const [showEditLocationPopup, setShowEditLocationPopup] = useState(false);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   const fetchLocationDetail = async () => {
@@ -73,43 +75,7 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
     fetchLocationDetail();
   };
 
-  const handleDeleteLocation = async () => {
-    if (!accessToken) return;
-
-    const confirmed = window.confirm(`Are you sure you want to delete location "${locationDetail?.location_name}"?`);
-    if (!confirmed) return;
-
-    setDeleting(true);
-    try {
-      const response = await fetch(`${apiUrl.podcore}/locations/${locationId}`, {
-        method: "DELETE",
-        headers: {
-          accept: "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete location");
-      }
-
-      toast({
-        title: "Success",
-        description: "Location deleted successfully",
-      });
-
-      onBack();
-    } catch (error) {
-      console.error("Error deleting location:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete location",
-        variant: "destructive",
-      });
-    } finally {
-      setDeleting(false);
-    }
-  };
+  // Delete is now handled by DeleteLocationPopup
 
   if (loading) {
     return (
@@ -239,8 +205,7 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
             <Button
               variant="destructive"
               className="rounded-lg text-xs md:text-sm h-8 px-2"
-              onClick={handleDeleteLocation}
-              disabled={deleting}
+              onClick={() => setShowDeletePopup(true)}
             >
               {deleting ? "Deleting..." : "Delete"}
             </Button>
@@ -368,6 +333,13 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
         onOpenChange={setShowEditLocationPopup}
         locationId={locationId}
         onSuccess={handlePopupSuccess}
+      />
+      <DeleteLocationPopup
+        open={showDeletePopup}
+        onOpenChange={setShowDeletePopup}
+        locationId={locationId}
+        locationName={locationDetail?.location_name || String(locationId)}
+        onSuccess={onBack}
       />
     </div>
   );
