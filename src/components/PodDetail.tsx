@@ -42,29 +42,7 @@ const PodDetail: React.FC<PodDetailProps> = ({ podId, onBack }) => {
 
     setDeleting(true);
     try {
-      // First get the onboard record ID using pod_id
-      const listRes = await fetch(`${apiUrl.podcore}/onboard/list/?pod_id=${podId}`, {
-        method: "GET",
-        headers: {
-          accept: "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      if (!listRes.ok) {
-        throw new Error("Failed to find onboard record");
-      }
-
-      const listData = await listRes.json();
-      const records = listData.records || listData;
-      const record = Array.isArray(records) ? records[0] : records;
-
-      if (!record || !record.id) {
-        throw new Error("No onboard record found for this pod");
-      }
-
-      // Delete the onboard record
-      const deleteRes = await fetch(`${apiUrl.podcore}/onboard/${record.id}`, {
+      const deleteRes = await fetch(`${apiUrl.podcore}/pods/${podId}`, {
         method: "DELETE",
         headers: {
           accept: "application/json",
