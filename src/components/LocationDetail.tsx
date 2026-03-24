@@ -334,6 +334,13 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
         locationId={locationId}
         onSuccess={handlePopupSuccess}
       />
+      <DeleteLocationPopup
+        open={showDeletePopup}
+        onOpenChange={setShowDeletePopup}
+        locationId={locationId}
+        locationName={locationDetail?.location_name || String(locationId)}
+        onSuccess={onBack}
+      />
     </div>
   );
 };

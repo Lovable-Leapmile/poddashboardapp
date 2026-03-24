@@ -369,6 +369,13 @@ const PodDetail: React.FC<PodDetailProps> = ({ podId, onBack }) => {
         podData={podDetail}
         onSuccess={handlePopupSuccess}
       />
+      <DeletePodPopup
+        open={showDeletePopup}
+        onOpenChange={setShowDeletePopup}
+        podId={podId}
+        podName={podDetail?.pod_name || String(podId)}
+        onSuccess={onBack}
+      />
     </div>
   );
 };
