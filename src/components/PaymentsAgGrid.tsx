@@ -344,6 +344,12 @@ const PaymentsAgGrid = () => {
                   suppressColumnVirtualisation={true}
                   rowSelection="single"
                   suppressRowClickSelection={true}
+                  onRowClicked={(event) => {
+                    if (event.data) {
+                      const paymentId = event.data.id || event.data.payment_reference_id;
+                      navigate(`/payments/${paymentId}`);
+                    }
+                  }}
                 />
               </div>
             </div>

@@ -413,6 +413,15 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
                   suppressColumnVirtualisation={true}
                   rowSelection="single"
                   suppressRowClickSelection={true}
+                  onRowClicked={(event) => {
+                    if (event.data) {
+                      if (isStandardMode && onStandardReservationClick) {
+                        onStandardReservationClick(event.data.id);
+                      } else if (!isStandardMode && onAdhocReservationClick) {
+                        onAdhocReservationClick(event.data.id);
+                      }
+                    }
+                  }}
                 />
               </div>
             </div>

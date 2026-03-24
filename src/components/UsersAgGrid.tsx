@@ -274,6 +274,9 @@ const UsersAgGrid: React.FC<UsersAgGridProps> = ({ users, loading, onBack, onUse
                   suppressColumnVirtualisation={true}
                   rowSelection="single"
                   suppressRowClickSelection={true}
+                  onRowClicked={(event) => {
+                    if (event.data) onUserClick(event.data.id);
+                  }}
                 />
               </div>
             </div>

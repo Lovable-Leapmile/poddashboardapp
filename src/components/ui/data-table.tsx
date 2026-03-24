@@ -52,6 +52,7 @@ export interface DataTableProps<T> {
   emptyTitle?: string;
   emptyDescription?: string;
   tableHeight?: string;
+  onRowClick?: (data: T) => void;
 }
 
 export function DataTable<T extends { id: number | string }>({
@@ -76,6 +77,7 @@ export function DataTable<T extends { id: number | string }>({
   emptyTitle,
   emptyDescription,
   tableHeight,
+  onRowClick,
 }: DataTableProps<T>) {
   const gridRef = useRef<AgGridReact>(null);
 
@@ -194,6 +196,9 @@ export function DataTable<T extends { id: number | string }>({
                   suppressColumnVirtualisation={true}
                   rowSelection="single"
                   suppressRowClickSelection={true}
+                  onRowClicked={onRowClick ? (event) => {
+                    if (event.data) onRowClick(event.data);
+                  } : undefined}
                 />
               </div>
             </div>

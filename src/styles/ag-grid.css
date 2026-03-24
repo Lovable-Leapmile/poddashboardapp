@@ -73,6 +73,7 @@
 .ag-theme-alpine .ag-row {
   border-bottom: 1px solid hsl(220 13% 91%); /* Light gray border */
   transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .ag-theme-alpine .ag-row:hover {

@@ -270,6 +270,9 @@ const LocationsTable: React.FC<LocationsTableProps> = ({ onLocationClick, isDash
                     suppressColumnVirtualisation={true}
                     rowSelection="single"
                     suppressRowClickSelection={true}
+                    onRowClicked={(event) => {
+                      if (event.data) onLocationClick(event.data.id);
+                    }}
                   />
                 </div>
               </div>
