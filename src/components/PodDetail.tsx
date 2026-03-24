@@ -34,36 +34,8 @@ const PodDetail: React.FC<PodDetailProps> = ({ podId, onBack }) => {
   const [showUpdateVersionPopup, setShowUpdateVersionPopup] = useState(false);
   const [showFEUpdatePopup, setShowFEUpdatePopup] = useState(false);
   const [showEditPodPopup, setShowEditPodPopup] = useState(false);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
   const isMobile = useMediaQuery("(max-width: 768px)");
-
-  const handleDeletePod = async () => {
-    if (!accessToken) return;
-    const confirmed = window.confirm(`Are you sure you want to delete pod "${podDetail?.pod_name || podId}"?`);
-    if (!confirmed) return;
-
-    setDeleting(true);
-    try {
-      const deleteRes = await fetch(`${apiUrl.podcore}/pods/${podId}`, {
-        method: "DELETE",
-        headers: {
-          accept: "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      if (!deleteRes.ok) {
-        throw new Error("Failed to delete pod");
-      }
-
-      toast.success("Pod deleted successfully");
-      onBack();
-    } catch (error: any) {
-      console.error("Error deleting pod:", error);
-      toast.error(error.message || "Failed to delete pod");
-    } finally {
-      setDeleting(false);
-    }
-  };
 
   const fetchPodDetail = async () => {
     if (!accessToken) return;
