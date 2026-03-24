@@ -75,43 +75,7 @@ const LocationDetail: React.FC<LocationDetailProps> = ({
     fetchLocationDetail();
   };
 
-  const handleDeleteLocation = async () => {
-    if (!accessToken) return;
-
-    const confirmed = window.confirm(`Are you sure you want to delete location "${locationDetail?.location_name}"?`);
-    if (!confirmed) return;
-
-    setDeleting(true);
-    try {
-      const response = await fetch(`${apiUrl.podcore}/locations/${locationId}`, {
-        method: "DELETE",
-        headers: {
-          accept: "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete location");
-      }
-
-      toast({
-        title: "Success",
-        description: "Location deleted successfully",
-      });
-
-      onBack();
-    } catch (error) {
-      console.error("Error deleting location:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete location",
-        variant: "destructive",
-      });
-    } finally {
-      setDeleting(false);
-    }
-  };
+  // Delete is now handled by DeleteLocationPopup
 
   if (loading) {
     return (
