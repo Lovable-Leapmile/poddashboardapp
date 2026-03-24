@@ -11,6 +11,7 @@ import EditModePopup from "./EditModePopup";
 import UpdatePodVersionPopup from "./UpdatePodVersionPopup";
 import FEUpdatePopup from "./FEUpdatePopup";
 import EditPodPopup from "./EditPodPopup";
+import DeletePodPopup from "./DeletePodPopup";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useApiUrl } from "@/hooks/useApiUrl";
 import { toast } from "sonner";
