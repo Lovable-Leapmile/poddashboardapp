@@ -194,6 +194,9 @@ export function DataTable<T extends { id: number | string }>({
                   suppressColumnVirtualisation={true}
                   rowSelection="single"
                   suppressRowClickSelection={true}
+                  onRowClicked={onRowClick ? (event) => {
+                    if (event.data) onRowClick(event.data);
+                  } : undefined}
                 />
               </div>
             </div>

@@ -352,6 +352,9 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
                   suppressColumnVirtualisation={true}
                   rowSelection="single"
                   suppressRowClickSelection={true}
+                  onRowClicked={(event) => {
+                    if (event.data) onPodClick(event.data.id);
+                  }}
                 />
               </div>
             </div>
