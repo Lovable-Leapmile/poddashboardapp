@@ -77,6 +77,7 @@ export function DataTable<T extends { id: number | string }>({
   emptyTitle,
   emptyDescription,
   tableHeight,
+  onRowClick,
 }: DataTableProps<T>) {
   const gridRef = useRef<AgGridReact>(null);
 
