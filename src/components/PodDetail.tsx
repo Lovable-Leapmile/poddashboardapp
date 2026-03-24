@@ -12,6 +12,8 @@ import UpdatePodVersionPopup from "./UpdatePodVersionPopup";
 import FEUpdatePopup from "./FEUpdatePopup";
 import EditPodPopup from "./EditPodPopup";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { useApiUrl } from "@/hooks/useApiUrl";
+import { toast } from "sonner";
 
 interface PodDetailProps {
   podId: number;
@@ -20,16 +22,69 @@ interface PodDetailProps {
 
 const PodDetail: React.FC<PodDetailProps> = ({ podId, onBack }) => {
   const { accessToken } = useAuth();
+  const apiUrl = useApiUrl();
   const [podDetail, setPodDetail] = useState<PodDetailType | null>(null);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [logsLoading, setLogsLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
   const [showHiddenSection, setShowHiddenSection] = useState(false);
   const [showEditModePopup, setShowEditModePopup] = useState(false);
   const [showUpdateVersionPopup, setShowUpdateVersionPopup] = useState(false);
   const [showFEUpdatePopup, setShowFEUpdatePopup] = useState(false);
   const [showEditPodPopup, setShowEditPodPopup] = useState(false);
   const isMobile = useMediaQuery("(max-width: 768px)");
+
+  const handleDeletePod = async () => {
+    if (!accessToken) return;
+    const confirmed = window.confirm(`Are you sure you want to delete pod "${podDetail?.pod_name || podId}"?`);
+    if (!confirmed) return;
+
+    setDeleting(true);
+    try {
+      // First get the onboard record ID using pod_id
+      const listRes = await fetch(`${apiUrl.podcore}/onboard/list/?pod_id=${podId}`, {
+        method: "GET",
+        headers: {
+          accept: "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!listRes.ok) {
+        throw new Error("Failed to find onboard record");
+      }
+
+      const listData = await listRes.json();
+      const records = listData.records || listData;
+      const record = Array.isArray(records) ? records[0] : records;
+
+      if (!record || !record.id) {
+        throw new Error("No onboard record found for this pod");
+      }
+
+      // Delete the onboard record
+      const deleteRes = await fetch(`${apiUrl.podcore}/onboard/${record.id}`, {
+        method: "DELETE",
+        headers: {
+          accept: "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!deleteRes.ok) {
+        throw new Error("Failed to delete pod");
+      }
+
+      toast.success("Pod deleted successfully");
+      onBack();
+    } catch (error: any) {
+      console.error("Error deleting pod:", error);
+      toast.error(error.message || "Failed to delete pod");
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const fetchPodDetail = async () => {
     if (!accessToken) return;
@@ -184,9 +239,14 @@ const PodDetail: React.FC<PodDetailProps> = ({ podId, onBack }) => {
                 <Edit className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
                 Edit
               </Button>
-              <Button variant="destructive" className="rounded-lg text-xs md:text-sm h-8 px-2 w-full md:w-auto">
+              <Button
+                variant="destructive"
+                className="rounded-lg text-xs md:text-sm h-8 px-2 w-full md:w-auto"
+                onClick={handleDeletePod}
+                disabled={deleting}
+              >
                 <Trash2 className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-                Delete
+                {deleting ? "Deleting..." : "Delete"}
               </Button>
               <div className="flex items-center space-x-2 mt-1">
                 <span className="text-xs md:text-sm text-gray-600">Touchless</span>
