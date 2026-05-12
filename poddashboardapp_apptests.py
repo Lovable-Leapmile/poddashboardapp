@@ -3,13 +3,13 @@ import time
 import random
 import os
 
-LEAPMILE_LOCAL_HOST = os.getenv("LEAPMILE_LOCAL_HOST")
-APP_NAME = "poddashboardapp"
-#APP_URL = f"https://{LEAPMILE_LOCAL_HOST}/{APP_NAME}"
+# LEAPMILE_LOCAL_HOST = os.getenv("LEAPMILE_LOCAL_HOST")
+# APP_NAME = "poddashboardapp"
+# APP_URL = f"https://{LEAPMILE_LOCAL_HOST}/{APP_NAME}"
 
-APP_URL = "https://preview--qikpod-dashboard.lovable.app/"
-LOGIN_PHONE = "6303744789"
-LOGIN_OTP = "367786"
+APP_URL = "https://testhostpod.leapmile.com/poddashboardapp"
+LOGIN_PHONE = "9778003310"
+LOGIN_OTP = "875311"
 
 USER_PHONE = "8547356155"
 USER_NAME = "Test User"
@@ -160,7 +160,7 @@ def test_delete_flow(page):
 # =========================
 # RUNNER
 # =========================
-def run_tests(headless=True):
+def run_tests(headless=False):
 
     log_header()
 
@@ -199,4 +199,4 @@ def run_tests(headless=True):
 # MAIN
 # =========================
 if __name__ == "__main__":
-    run_tests(headless=True)
+    run_tests(headless=False)
