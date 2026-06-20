@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Download, RefreshCw, Search } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import NoDataIllustration from "@/components/ui/no-data-illustration";
+import TablePagination from "@/components/ui/table-pagination";
 import { useApiUrl } from "@/hooks/useApiUrl";
 import { useAuth } from "@/contexts/AuthContext";
 import "ag-grid-community/styles/ag-grid.css";
