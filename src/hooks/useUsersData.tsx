@@ -14,7 +14,8 @@ export const useUsersData = () => {
     if (!accessToken) return;
     setLoading(true);
     try {
-      const userData = await dashboardApi.getUsers(accessToken, 1000);
+      // Fetch full dataset so search works globally, not just within current page
+      const userData = await dashboardApi.getUsers(accessToken, 10000);
       setUsers(userData);
     } catch (error) {
       console.error('Error fetching users:', error);
