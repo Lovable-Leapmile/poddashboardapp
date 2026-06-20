@@ -4,13 +4,14 @@ import {
   Card,
   CardContent,
 } from '@/components/ui/card';
-import { MapPin, Package, Users, Calendar } from 'lucide-react';
+import { MapPin, Package, Users, Calendar, Zap } from 'lucide-react';
 import { usePodStats } from '@/hooks/usePodStats';
 
 interface DashboardStatsProps {
   dashboardStats: {
     locations: number;
     pods: number;
+    activePods: number;
     users: number;
     reservations: number;
   };
@@ -38,6 +39,12 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
       route: '/pods',
     },
     {
+      title: 'ACTIVE PODS',
+      value: dashboardStats.activePods.toString(),
+      icon: Zap,
+      route: '/pods',
+    },
+    {
       title: 'USERS',
       value: dashboardStats.users.toString(),
       icon: Users,
@@ -52,7 +59,7 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
       {statsData.map((stat, index) => (
         <Card
           key={index}

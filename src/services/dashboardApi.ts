@@ -264,6 +264,15 @@ export const dashboardApi = {
     return data.total_count || data.total_records || 0;
   },
 
+  getActivePodsCount: async (token: string): Promise<number> => {
+    const response = await fetch(
+      `${getBaseUrl()}/pods/?status=active&num_records=1`,
+      { headers: getAuthHeaders(token) },
+    );
+    const data: ApiResponse<Pod> = await response.json();
+    return data.total_count || data.total_records || 0;
+  },
+
   getUsersCount: async (token: string): Promise<number> => {
     const response = await fetch(`${getBaseUrl()}/users/?order_by_field=updated_at&order_by_type=DESC&num_records=1`, {
       headers: getAuthHeaders(token),
