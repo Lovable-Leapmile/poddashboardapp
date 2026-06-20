@@ -52,7 +52,7 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false, 
     if (!accessToken) return;
     setLoading(true);
     try {
-      const data = isDashboard
+      const data = podType === 'active'
         ? await dashboardApi.getActivePods(accessToken)
         : await dashboardApi.getPods(accessToken, pageSize);
       setPods(data || []);
