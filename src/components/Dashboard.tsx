@@ -24,6 +24,7 @@ const Dashboard = () => {
   const [dashboardStats, setDashboardStats] = useState({
     locations: 0,
     pods: 0,
+    activePods: 0,
     users: 0,
     reservations: 0
   });
@@ -38,15 +39,17 @@ const Dashboard = () => {
     if (!accessToken) return;
     setStatsLoading(true);
     try {
-      const [locations, pods, users, reservations] = await Promise.all([
+      const [locations, pods, activePods, users, reservations] = await Promise.all([
         dashboardApi.getLocationsCount(accessToken),
         dashboardApi.getPodsCount(accessToken),
+        dashboardApi.getActivePodsCount(accessToken),
         dashboardApi.getUsersCount(accessToken),
         dashboardApi.getReservationsCount(accessToken)
       ]);
       setDashboardStats({
         locations,
         pods,
+        activePods,
         users,
         reservations
       });
