@@ -32,7 +32,7 @@ interface PodsTableProps {
   podType?: 'all' | 'active';
 }
 
-const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }) => {
+const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false, podType = 'all' }) => {
   const { accessToken } = useAuth();
   const navigate = useNavigate();
   const gridRef = useRef<AgGridReact>(null);
