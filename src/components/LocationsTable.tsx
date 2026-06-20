@@ -258,6 +258,7 @@ const LocationsTable: React.FC<LocationsTableProps> = ({ onLocationClick, isDash
                     }}
                     pagination={true}
                     paginationPageSize={pageSize}
+                    suppressPaginationPanel={true}
                     loading={loading}
                     suppressRowHoverHighlight={false}
                     suppressCellFocus={true}
@@ -275,6 +276,7 @@ const LocationsTable: React.FC<LocationsTableProps> = ({ onLocationClick, isDash
                     }}
                   />
                 </div>
+                <TablePagination gridRef={gridRef} pageSize={pageSize} onPageSizeChange={setPageSize} />
               </div>
 
               {/* Mobile view - Cards with Pull to Refresh */}
