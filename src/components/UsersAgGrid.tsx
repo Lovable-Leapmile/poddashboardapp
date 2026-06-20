@@ -263,6 +263,7 @@ const UsersAgGrid: React.FC<UsersAgGridProps> = ({ users, loading, onBack, onUse
                   }}
                   pagination={true}
                   paginationPageSize={pageSize}
+                  suppressPaginationPanel={true}
                   loading={loading}
                   suppressRowHoverHighlight={false}
                   suppressCellFocus={true}
@@ -280,6 +281,7 @@ const UsersAgGrid: React.FC<UsersAgGridProps> = ({ users, loading, onBack, onUse
                   }}
                 />
               </div>
+              <TablePagination gridRef={gridRef} pageSize={pageSize} onPageSizeChange={setPageSize} />
             </div>
 
             {/* Mobile view - Cards */}
