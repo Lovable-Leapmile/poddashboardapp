@@ -62,7 +62,7 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false, 
     } finally {
       setLoading(false);
     }
-  }, [accessToken, pageSize, isDashboard]);
+  }, [accessToken, pageSize, podType]);
 
   useEffect(() => {
     fetchData();
