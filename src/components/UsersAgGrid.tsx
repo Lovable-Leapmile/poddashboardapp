@@ -19,6 +19,7 @@ import { User } from "@/services/dashboardApi";
 import AddUserPopup from "./AddUserPopup";
 import UserCard from "./UserCard";
 import NoDataIllustration from "@/components/ui/no-data-illustration";
+import TablePagination from "@/components/ui/table-pagination";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import "@/styles/ag-grid.css";
