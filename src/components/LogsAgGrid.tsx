@@ -16,6 +16,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { MobileCardSkeleton } from "@/components/ui/mobile-card-skeleton";
 import { PullToRefreshContainer } from "@/components/ui/pull-to-refresh";
+import TablePagination from "@/components/ui/table-pagination";
 interface LogData {
   id: number;
   log_id: string;
