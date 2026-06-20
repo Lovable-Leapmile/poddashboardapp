@@ -254,7 +254,9 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false, 
                   <span className="hidden sm:inline">Back</span>
                 </Button>
                 <Package className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700 flex-shrink-0" />
-                <h2 className="text-base sm:text-lg font-semibold text-gray-900 truncate">Pods</h2>
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
+                  {podType === 'active' ? 'Active Pods' : 'All Pods'}
+                </h2>
               </div>
             </div>
 
