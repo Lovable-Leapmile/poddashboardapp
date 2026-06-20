@@ -29,6 +29,7 @@ import { PullToRefreshContainer } from "@/components/ui/pull-to-refresh";
 interface PodsTableProps {
   onPodClick: (id: number) => void;
   isDashboard?: boolean;
+  podType?: 'all' | 'active';
 }
 
 const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }) => {
