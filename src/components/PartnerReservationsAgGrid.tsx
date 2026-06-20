@@ -329,6 +329,7 @@ const PartnerReservationsAgGrid: React.FC = () => {
               }}
               pagination={true}
               paginationPageSize={pageSize}
+              suppressPaginationPanel={true}
               loading={loading}
               suppressRowHoverHighlight={false}
               suppressCellFocus={true}
