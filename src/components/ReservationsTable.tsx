@@ -45,6 +45,7 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
   const [standardReservations, setStandardReservations] = useState<StandardReservation[]>([]);
   const [adhocReservations, setAdhocReservations] = useState<AdhocReservation[]>([]);
   const [loading, setLoading] = useState(false);
+  const [pageSize, setPageSize] = useState(25);
 
   const standardFilters = useTableFilters(
     standardReservations,
