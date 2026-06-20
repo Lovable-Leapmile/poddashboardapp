@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 import NoDataIllustration from "@/components/ui/no-data-illustration";
 import { MobileCardSkeleton } from "@/components/ui/mobile-card-skeleton";
 import { PullToRefreshContainer } from "@/components/ui/pull-to-refresh";
+import TablePagination from "@/components/ui/table-pagination";
 
 interface PodsTableProps {
   onPodClick: (id: number) => void;
