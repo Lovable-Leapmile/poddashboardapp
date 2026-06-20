@@ -24,6 +24,7 @@ import TableFilters, { FilterConfig, FilterState } from "@/components/filters/Ta
 import { useTableFilters } from "@/hooks/useTableFilters";
 import { MobileCardSkeleton } from "@/components/ui/mobile-card-skeleton";
 import { PullToRefreshContainer } from "@/components/ui/pull-to-refresh";
+import TablePagination from "@/components/ui/table-pagination";
 interface LocationsTableProps {
   onLocationClick: (id: number) => void;
   isDashboard?: boolean;
