@@ -95,7 +95,11 @@ const DashboardPage: React.FC = () => {
           </div>
 
           <div className="w-full">
-            <PodsTable onPodClick={handlePodClick} isDashboard={true} />
+            <PodsTable onPodClick={handlePodClick} isDashboard={true} podType="active" />
+          </div>
+
+          <div className="w-full">
+            <PodsTable onPodClick={handlePodClick} isDashboard={true} podType="all" />
           </div>
         </div>
       </div>

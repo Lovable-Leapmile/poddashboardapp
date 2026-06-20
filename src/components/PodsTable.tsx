@@ -29,9 +29,10 @@ import { PullToRefreshContainer } from "@/components/ui/pull-to-refresh";
 interface PodsTableProps {
   onPodClick: (id: number) => void;
   isDashboard?: boolean;
+  podType?: 'all' | 'active';
 }
 
-const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }) => {
+const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false, podType = 'all' }) => {
   const { accessToken } = useAuth();
   const navigate = useNavigate();
   const gridRef = useRef<AgGridReact>(null);
@@ -51,7 +52,7 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
     if (!accessToken) return;
     setLoading(true);
     try {
-      const data = isDashboard
+      const data = podType === 'active'
         ? await dashboardApi.getActivePods(accessToken)
         : await dashboardApi.getPods(accessToken, pageSize);
       setPods(data || []);
@@ -61,7 +62,7 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
     } finally {
       setLoading(false);
     }
-  }, [accessToken, pageSize, isDashboard]);
+  }, [accessToken, pageSize, podType]);
 
   useEffect(() => {
     fetchData();
@@ -253,7 +254,9 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
                   <span className="hidden sm:inline">Back</span>
                 </Button>
                 <Package className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700 flex-shrink-0" />
-                <h2 className="text-base sm:text-lg font-semibold text-gray-900 truncate">Pods</h2>
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
+                  {podType === 'active' ? 'Active Pods' : 'All Pods'}
+                </h2>
               </div>
             </div>
 
