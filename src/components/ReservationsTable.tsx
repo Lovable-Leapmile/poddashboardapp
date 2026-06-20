@@ -28,6 +28,7 @@ import { MobileCardSkeleton } from "@/components/ui/mobile-card-skeleton";
 import { PullToRefreshContainer } from "@/components/ui/pull-to-refresh";
 import { SwipeableCard } from "@/components/ui/swipeable-card";
 import { toast } from "sonner";
+import TablePagination from "@/components/ui/table-pagination";
 
 interface ReservationsTableProps {
   onStandardReservationClick?: (reservationId: number) => void;
