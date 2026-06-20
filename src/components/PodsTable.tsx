@@ -29,10 +29,9 @@ import { PullToRefreshContainer } from "@/components/ui/pull-to-refresh";
 interface PodsTableProps {
   onPodClick: (id: number) => void;
   isDashboard?: boolean;
-  podType?: 'all' | 'active';
 }
 
-const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false, podType = 'all' }) => {
+const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }) => {
   const { accessToken } = useAuth();
   const navigate = useNavigate();
   const gridRef = useRef<AgGridReact>(null);
@@ -44,25 +43,36 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false, 
   const { filters, setFilters, filteredData, resetFilters } = useTableFilters<Pod>(
     pods,
     ["pod_name", "location_name", "pod_health"],
-    "status",
+    undefined,
     undefined,
   );
+
+  const statusFilter = filters.status;
 
   const fetchData = useCallback(async () => {
     if (!accessToken) return;
     setLoading(true);
     try {
-      const data = podType === 'active'
+      const data = statusFilter === 'active'
         ? await dashboardApi.getActivePods(accessToken)
         : await dashboardApi.getPods(accessToken, pageSize);
-      setPods(data || []);
+      const finalData = statusFilter === 'inactive'
+        ? (data || []).filter((p) => {
+            if (!p.pinged_at) return true;
+            try {
+              const t = new Date(p.pinged_at.replace(" ", "T")).getTime();
+              return (Date.now() - t) > 5 * 60 * 1000;
+            } catch { return true; }
+          })
+        : (data || []);
+      setPods(finalData);
     } catch (error) {
       console.error("Error fetching pods:", error);
       setPods([]);
     } finally {
       setLoading(false);
     }
-  }, [accessToken, pageSize, podType]);
+  }, [accessToken, pageSize, statusFilter]);
 
   useEffect(() => {
     fetchData();
