@@ -68,7 +68,8 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
     if (!accessToken) return;
     setLoading(true);
     try {
-      const data = await dashboardApi.getStandardReservations(accessToken);
+      // Fetch full dataset so search/filter work globally
+      const data = await dashboardApi.getStandardReservations(accessToken, 10000);
       setStandardReservations(data);
     } catch (error) {
       console.error("Error fetching standard reservations:", error);
@@ -81,7 +82,7 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
     if (!accessToken) return;
     setLoading(true);
     try {
-      const data = await dashboardApi.getAdhocReservations(accessToken);
+      const data = await dashboardApi.getAdhocReservations(accessToken, 10000);
       setAdhocReservations(data);
     } catch (error) {
       console.error("Error fetching adhoc reservations:", error);

@@ -54,9 +54,10 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
     if (!accessToken) return;
     setLoading(true);
     try {
+      // Fetch full dataset so search/filter work globally, not just within current page
       const data = statusFilter === 'active'
         ? await dashboardApi.getActivePods(accessToken)
-        : await dashboardApi.getPods(accessToken, pageSize);
+        : await dashboardApi.getPods(accessToken, 10000);
       const finalData = statusFilter === 'inactive'
         ? (data || []).filter((p) => {
             if (!p.pinged_at) return true;
@@ -73,7 +74,7 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
     } finally {
       setLoading(false);
     }
-  }, [accessToken, pageSize, statusFilter]);
+  }, [accessToken, statusFilter]);
 
   useEffect(() => {
     fetchData();

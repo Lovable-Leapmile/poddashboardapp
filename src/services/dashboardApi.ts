@@ -361,7 +361,7 @@ export const dashboardApi = {
 
   getActivePods: async (token: string): Promise<Pod[]> => {
     const response = await fetch(
-      `${getBaseUrl()}/pods/?status=active&order_by_field=updated_at&order_by_type=DESC&num_records=100`,
+      `${getBaseUrl()}/pods/?status=active&order_by_field=updated_at&order_by_type=DESC&num_records=10000`,
       {
         headers: getAuthHeaders(token),
       },

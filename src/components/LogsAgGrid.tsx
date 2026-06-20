@@ -44,7 +44,8 @@ const LogsAgGrid = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `${apiUrl.logstore}/logs/?order_by_field=updated_at&order_by_type=DESC&num_records=${pageSize}`,
+        // Fetch full dataset so search/filter work globally
+        `${apiUrl.logstore}/logs/?order_by_field=updated_at&order_by_type=DESC&num_records=10000`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -63,7 +64,7 @@ const LogsAgGrid = () => {
     } finally {
       setLoading(false);
     }
-  }, [accessToken, pageSize, apiUrl.logstore]);
+  }, [accessToken, apiUrl.logstore]);
   useEffect(() => {
     fetchLogs();
   }, [fetchLogs]);

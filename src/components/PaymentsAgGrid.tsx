@@ -45,7 +45,8 @@ const PaymentsAgGrid = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `${apiUrl.payments}/payments/?order_by_field=updated_at&order_by_type=DESC&num_records=${pageSize}`,
+        // Fetch full dataset so search/filter work globally
+        `${apiUrl.payments}/payments/?order_by_field=updated_at&order_by_type=DESC&num_records=10000`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -64,7 +65,7 @@ const PaymentsAgGrid = () => {
     } finally {
       setLoading(false);
     }
-  }, [accessToken, pageSize]);
+  }, [accessToken]);
   useEffect(() => {
     fetchPayments();
   }, [fetchPayments]);
