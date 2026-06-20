@@ -51,7 +51,9 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
     if (!accessToken) return;
     setLoading(true);
     try {
-      const data = await dashboardApi.getPods(accessToken, pageSize);
+      const data = isDashboard
+        ? await dashboardApi.getActivePods(accessToken)
+        : await dashboardApi.getPods(accessToken, pageSize);
       setPods(data || []);
     } catch (error) {
       console.error("Error fetching pods:", error);
@@ -59,7 +61,7 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
     } finally {
       setLoading(false);
     }
-  }, [accessToken, pageSize]);
+  }, [accessToken, pageSize, isDashboard]);
 
   useEffect(() => {
     fetchData();
