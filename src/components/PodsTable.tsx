@@ -43,7 +43,7 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
 
   const { filters, setFilters, filteredData, resetFilters } = useTableFilters<Pod>(
     pods,
-    ["pod_name", "location_name", "pod_health"],
+    ["id", "pod_name", "location_name", "pod_health"],
     undefined,
     undefined,
   );
