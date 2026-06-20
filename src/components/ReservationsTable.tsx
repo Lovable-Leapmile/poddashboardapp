@@ -402,7 +402,8 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
                     cellClass: "flex items-center",
                   }}
                   pagination={true}
-                  paginationPageSize={25}
+                  paginationPageSize={pageSize}
+                  suppressPaginationPanel={true}
                   loading={loading}
                   suppressRowHoverHighlight={false}
                   suppressCellFocus={true}
@@ -426,6 +427,7 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
                   }}
                 />
               </div>
+              <TablePagination gridRef={gridRef} pageSize={pageSize} onPageSizeChange={setPageSize} />
             </div>
 
             {/* Mobile view - Cards with Pull to Refresh */}
