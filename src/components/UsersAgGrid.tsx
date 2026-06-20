@@ -19,6 +19,7 @@ import { User } from "@/services/dashboardApi";
 import AddUserPopup from "./AddUserPopup";
 import UserCard from "./UserCard";
 import NoDataIllustration from "@/components/ui/no-data-illustration";
+import TablePagination from "@/components/ui/table-pagination";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import "@/styles/ag-grid.css";
@@ -262,6 +263,7 @@ const UsersAgGrid: React.FC<UsersAgGridProps> = ({ users, loading, onBack, onUse
                   }}
                   pagination={true}
                   paginationPageSize={pageSize}
+                  suppressPaginationPanel={true}
                   loading={loading}
                   suppressRowHoverHighlight={false}
                   suppressCellFocus={true}
@@ -279,6 +281,7 @@ const UsersAgGrid: React.FC<UsersAgGridProps> = ({ users, loading, onBack, onUse
                   }}
                 />
               </div>
+              <TablePagination gridRef={gridRef} pageSize={pageSize} onPageSizeChange={setPageSize} />
             </div>
 
             {/* Mobile view - Cards */}

@@ -28,6 +28,7 @@ import { MobileCardSkeleton } from "@/components/ui/mobile-card-skeleton";
 import { PullToRefreshContainer } from "@/components/ui/pull-to-refresh";
 import { SwipeableCard } from "@/components/ui/swipeable-card";
 import { toast } from "sonner";
+import TablePagination from "@/components/ui/table-pagination";
 
 interface ReservationsTableProps {
   onStandardReservationClick?: (reservationId: number) => void;
@@ -44,6 +45,7 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
   const [standardReservations, setStandardReservations] = useState<StandardReservation[]>([]);
   const [adhocReservations, setAdhocReservations] = useState<AdhocReservation[]>([]);
   const [loading, setLoading] = useState(false);
+  const [pageSize, setPageSize] = useState(25);
 
   const standardFilters = useTableFilters(
     standardReservations,
@@ -400,7 +402,8 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
                     cellClass: "flex items-center",
                   }}
                   pagination={true}
-                  paginationPageSize={25}
+                  paginationPageSize={pageSize}
+                  suppressPaginationPanel={true}
                   loading={loading}
                   suppressRowHoverHighlight={false}
                   suppressCellFocus={true}
@@ -424,6 +427,7 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
                   }}
                 />
               </div>
+              <TablePagination gridRef={gridRef} pageSize={pageSize} onPageSizeChange={setPageSize} />
             </div>
 
             {/* Mobile view - Cards with Pull to Refresh */}

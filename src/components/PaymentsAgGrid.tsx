@@ -16,6 +16,7 @@ import { useApiUrl } from "@/hooks/useApiUrl";
 import CreatePaymentPopup from "@/components/CreatePaymentPopup";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
+import TablePagination from "@/components/ui/table-pagination";
 interface PaymentData {
   id: number;
   payment_reference_id: string;
@@ -332,6 +333,7 @@ const PaymentsAgGrid = () => {
                   }}
                   pagination={true}
                   paginationPageSize={pageSize}
+                  suppressPaginationPanel={true}
                   loading={loading}
                   suppressRowHoverHighlight={false}
                   suppressCellFocus={true}
@@ -352,6 +354,7 @@ const PaymentsAgGrid = () => {
                   }}
                 />
               </div>
+              <TablePagination gridRef={gridRef} pageSize={pageSize} onPageSizeChange={setPageSize} />
             </div>
 
             {/* Mobile view - Cards */}

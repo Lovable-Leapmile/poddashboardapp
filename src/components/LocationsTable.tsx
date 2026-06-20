@@ -24,6 +24,7 @@ import TableFilters, { FilterConfig, FilterState } from "@/components/filters/Ta
 import { useTableFilters } from "@/hooks/useTableFilters";
 import { MobileCardSkeleton } from "@/components/ui/mobile-card-skeleton";
 import { PullToRefreshContainer } from "@/components/ui/pull-to-refresh";
+import TablePagination from "@/components/ui/table-pagination";
 interface LocationsTableProps {
   onLocationClick: (id: number) => void;
   isDashboard?: boolean;
@@ -258,6 +259,7 @@ const LocationsTable: React.FC<LocationsTableProps> = ({ onLocationClick, isDash
                     }}
                     pagination={true}
                     paginationPageSize={pageSize}
+                    suppressPaginationPanel={true}
                     loading={loading}
                     suppressRowHoverHighlight={false}
                     suppressCellFocus={true}
@@ -275,6 +277,7 @@ const LocationsTable: React.FC<LocationsTableProps> = ({ onLocationClick, isDash
                     }}
                   />
                 </div>
+                <TablePagination gridRef={gridRef} pageSize={pageSize} onPageSizeChange={setPageSize} />
               </div>
 
               {/* Mobile view - Cards with Pull to Refresh */}

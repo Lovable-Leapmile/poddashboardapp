@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 import NoDataIllustration from "@/components/ui/no-data-illustration";
 import { MobileCardSkeleton } from "@/components/ui/mobile-card-skeleton";
 import { PullToRefreshContainer } from "@/components/ui/pull-to-refresh";
+import TablePagination from "@/components/ui/table-pagination";
 
 interface PodsTableProps {
   onPodClick: (id: number) => void;
@@ -355,6 +356,7 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
                   }}
                   pagination={true}
                   paginationPageSize={pageSize}
+                  suppressPaginationPanel={true}
                   loading={loading}
                   suppressRowHoverHighlight={false}
                   suppressCellFocus={true}
@@ -372,6 +374,7 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
                   }}
                 />
               </div>
+              <TablePagination gridRef={gridRef} pageSize={pageSize} onPageSizeChange={setPageSize} />
             </div>
 
             {/* Mobile view - Cards with Pull to Refresh */}

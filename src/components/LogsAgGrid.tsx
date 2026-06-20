@@ -16,6 +16,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { MobileCardSkeleton } from "@/components/ui/mobile-card-skeleton";
 import { PullToRefreshContainer } from "@/components/ui/pull-to-refresh";
+import TablePagination from "@/components/ui/table-pagination";
 interface LogData {
   id: number;
   log_id: string;
@@ -316,7 +317,7 @@ const LogsAgGrid = () => {
                   }}
                   pagination={true}
                   paginationPageSize={pageSize}
-                  paginationPageSizeSelector={[10, 25, 50, 100]}
+                  suppressPaginationPanel={true}
                   loading={loading}
                   suppressRowHoverHighlight={false}
                   suppressCellFocus={true}
@@ -331,6 +332,7 @@ const LogsAgGrid = () => {
                   suppressRowClickSelection={true}
                 />
               </div>
+              <TablePagination gridRef={gridRef} pageSize={pageSize} onPageSizeChange={setPageSize} />
             </div>
 
             {/* Mobile view - Cards with Pull to Refresh */}

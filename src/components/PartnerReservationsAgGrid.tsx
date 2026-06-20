@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Download, RefreshCw, Search } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import NoDataIllustration from "@/components/ui/no-data-illustration";
+import TablePagination from "@/components/ui/table-pagination";
 import { useApiUrl } from "@/hooks/useApiUrl";
 import { useAuth } from "@/contexts/AuthContext";
 import "ag-grid-community/styles/ag-grid.css";
@@ -315,34 +316,38 @@ const PartnerReservationsAgGrid: React.FC = () => {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
           </div>
         ) : hasData ? (
-          <div className="ag-theme-alpine h-[calc(100vh-200px)] w-full max-w-full rounded-xl overflow-hidden border border-gray-200 shadow-sm">
-            <AgGridReact
-              ref={gridRef}
-              rowData={filteredData}
-              columnDefs={columnDefs}
-              defaultColDef={{
-                resizable: true,
-                sortable: true,
-                filter: true,
-                cellClass: "flex items-center",
-              }}
-              pagination={true}
-              paginationPageSize={pageSize}
-              loading={loading}
-              suppressRowHoverHighlight={false}
-              suppressCellFocus={true}
-              animateRows={true}
-              rowBuffer={10}
-              enableCellTextSelection={true}
-              onGridReady={onGridReady}
-              rowHeight={36}
-              headerHeight={38}
-              suppressColumnVirtualisation={true}
-              rowSelection="single"
-              suppressRowClickSelection={true}
-              quickFilterText={globalFilter}
-            />
-          </div>
+          <>
+            <div className="ag-theme-alpine h-[calc(100vh-200px)] w-full max-w-full rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+              <AgGridReact
+                ref={gridRef}
+                rowData={filteredData}
+                columnDefs={columnDefs}
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                  filter: true,
+                  cellClass: "flex items-center",
+                }}
+                pagination={true}
+                paginationPageSize={pageSize}
+                suppressPaginationPanel={true}
+                loading={loading}
+                suppressRowHoverHighlight={false}
+                suppressCellFocus={true}
+                animateRows={true}
+                rowBuffer={10}
+                enableCellTextSelection={true}
+                onGridReady={onGridReady}
+                rowHeight={36}
+                headerHeight={38}
+                suppressColumnVirtualisation={true}
+                rowSelection="single"
+                suppressRowClickSelection={true}
+                quickFilterText={globalFilter}
+              />
+            </div>
+            <TablePagination gridRef={gridRef} pageSize={pageSize} onPageSizeChange={setPageSize} />
+          </>
         ) : (
           <NoDataIllustration
             title="No reservations found"
