@@ -16,6 +16,7 @@ import { useApiUrl } from "@/hooks/useApiUrl";
 import CreatePaymentPopup from "@/components/CreatePaymentPopup";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
+import TablePagination from "@/components/ui/table-pagination";
 interface PaymentData {
   id: number;
   payment_reference_id: string;
