@@ -52,7 +52,8 @@ const LocationsTable: React.FC<LocationsTableProps> = ({ onLocationClick, isDash
     if (!accessToken) return;
     setLoading(true);
     try {
-      const data = await dashboardApi.getLocations(accessToken, pageSize);
+      // Fetch full dataset so search/filter work globally, not just within current page
+      const data = await dashboardApi.getLocations(accessToken, 10000);
       setLocations(data || []);
     } catch (error) {
       console.error("Error fetching locations:", error);
@@ -60,7 +61,7 @@ const LocationsTable: React.FC<LocationsTableProps> = ({ onLocationClick, isDash
     } finally {
       setLoading(false);
     }
-  }, [accessToken, pageSize]);
+  }, [accessToken]);
   useEffect(() => {
     fetchData();
   }, [fetchData]);
