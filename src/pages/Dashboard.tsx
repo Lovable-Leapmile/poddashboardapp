@@ -16,6 +16,7 @@ const DashboardPage: React.FC = () => {
   const [dashboardStats, setDashboardStats] = useState({
     locations: 0,
     pods: 0,
+    activePods: 0,
     users: 0,
     reservations: 0,
   });
@@ -27,15 +28,17 @@ const DashboardPage: React.FC = () => {
     if (!accessToken) return;
     setStatsLoading(true);
     try {
-      const [locations, pods, users, reservations] = await Promise.all([
+      const [locations, pods, activePods, users, reservations] = await Promise.all([
         dashboardApi.getLocationsCount(accessToken),
         dashboardApi.getPodsCount(accessToken),
+        dashboardApi.getActivePodsCount(accessToken),
         dashboardApi.getUsersCount(accessToken),
         dashboardApi.getReservationsCount(accessToken),
       ]);
       setDashboardStats({
         locations,
         pods,
+        activePods,
         users,
         reservations,
       });
@@ -95,11 +98,7 @@ const DashboardPage: React.FC = () => {
           </div>
 
           <div className="w-full">
-            <PodsTable onPodClick={handlePodClick} isDashboard={true} podType="active" />
-          </div>
-
-          <div className="w-full">
-            <PodsTable onPodClick={handlePodClick} isDashboard={true} podType="all" />
+            <PodsTable onPodClick={handlePodClick} isDashboard={true} />
           </div>
         </div>
       </div>
