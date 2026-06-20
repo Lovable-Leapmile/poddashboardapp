@@ -20,6 +20,7 @@ interface DashboardContentProps {
   dashboardStats: {
     locations: number;
     pods: number;
+    activePods: number;
     users: number;
     reservations: number;
   };
