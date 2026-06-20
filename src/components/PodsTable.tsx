@@ -356,6 +356,7 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
                   }}
                   pagination={true}
                   paginationPageSize={pageSize}
+                  suppressPaginationPanel={true}
                   loading={loading}
                   suppressRowHoverHighlight={false}
                   suppressCellFocus={true}
@@ -373,6 +374,7 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
                   }}
                 />
               </div>
+              <TablePagination gridRef={gridRef} pageSize={pageSize} onPageSizeChange={setPageSize} />
             </div>
 
             {/* Mobile view - Cards with Pull to Refresh */}
