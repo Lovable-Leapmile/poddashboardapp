@@ -91,8 +91,8 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
     }
   };
 
-  const StatusBadge: React.FC<{ pingedAt?: string }> = ({ pingedAt }) => {
-    const active = isPodActive(pingedAt);
+  const StatusBadge: React.FC<{ status?: string }> = ({ status }) => {
+    const active = (status || "").toLowerCase() === "active";
     return (
       <span
         className={cn(
