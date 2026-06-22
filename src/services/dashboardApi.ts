@@ -249,7 +249,7 @@ const getAuthHeaders = (token: string) => ({
 export const dashboardApi = {
   // Count APIs
   getLocationsCount: async (token: string): Promise<number> => {
-    const response = await fetch(`${getBaseUrl()}/locations/?num_records=1`, {
+    const response = await fetch(`${getBaseUrl()}/locations/?order_by_field=updated_at&order_by_type=DESC&num_records=1`, {
       headers: getAuthHeaders(token),
     });
     const data: ApiResponse<Location> = await response.json();
@@ -257,7 +257,7 @@ export const dashboardApi = {
   },
 
   getPodsCount: async (token: string): Promise<number> => {
-    const response = await fetch(`${getBaseUrl()}/pods/?num_records=1`, {
+    const response = await fetch(`${getBaseUrl()}/pods/?order_by_field=updated_at&order_by_type=DESC&num_records=1`, {
       headers: getAuthHeaders(token),
     });
     const data: ApiResponse<Pod> = await response.json();
@@ -266,7 +266,7 @@ export const dashboardApi = {
 
   getActivePodsCount: async (token: string): Promise<number> => {
     const response = await fetch(
-      `${getBaseUrl()}/pods/?status=active&num_records=1`,
+      `${getBaseUrl()}/pods/?status=active&order_by_field=updated_at&order_by_type=DESC&num_records=1`,
       { headers: getAuthHeaders(token) },
     );
     const data: ApiResponse<Pod> = await response.json();
@@ -282,7 +282,7 @@ export const dashboardApi = {
   },
 
   getReservationsCount: async (token: string): Promise<number> => {
-    const response = await fetch(`${getBaseUrl()}/reservations/?num_records=1`, {
+    const response = await fetch(`${getBaseUrl()}/reservations/?order_by_field=updated_at&order_by_type=DESC&num_records=1`, {
       headers: getAuthHeaders(token),
     });
     const data: ApiResponse<Reservation> = await response.json();
@@ -344,7 +344,7 @@ export const dashboardApi = {
 
   // Data APIs
   getLocations: async (token: string, numRecords: number = 100): Promise<Location[]> => {
-    const response = await fetch(`${getBaseUrl()}/locations/?num_records=${numRecords}`, {
+    const response = await fetch(`${getBaseUrl()}/locations/?order_by_field=updated_at&order_by_type=DESC&num_records=${numRecords}`, {
       headers: getAuthHeaders(token),
     });
     const data: ApiResponse<Location> = await response.json();
@@ -352,7 +352,7 @@ export const dashboardApi = {
   },
 
   getPods: async (token: string, numRecords: number = 100): Promise<Pod[]> => {
-    const response = await fetch(`${getBaseUrl()}/pods/?num_records=${numRecords}`, {
+    const response = await fetch(`${getBaseUrl()}/pods/?order_by_field=updated_at&order_by_type=DESC&num_records=${numRecords}`, {
       headers: getAuthHeaders(token),
     });
     const data: ApiResponse<Pod> = await response.json();
@@ -371,7 +371,7 @@ export const dashboardApi = {
   },
 
   getUsers: async (token: string, numRecords: number = 100): Promise<User[]> => {
-    const response = await fetch(`${getBaseUrl()}/users/?num_records=${numRecords}`, {
+    const response = await fetch(`${getBaseUrl()}/users/?order_by_field=updated_at&order_by_type=DESC&num_records=${numRecords}`, {
       headers: getAuthHeaders(token),
     });
     const data: ApiResponse<User> = await response.json();
@@ -379,7 +379,7 @@ export const dashboardApi = {
   },
 
   getReservations: async (token: string, numRecords: number = 100): Promise<Reservation[]> => {
-    const response = await fetch(`${getBaseUrl()}/reservations/?num_records=${numRecords}`, {
+    const response = await fetch(`${getBaseUrl()}/reservations/?order_by_field=updated_at&order_by_type=DESC&num_records=${numRecords}`, {
       headers: getAuthHeaders(token),
     });
     const data: ApiResponse<Reservation> = await response.json();
@@ -388,7 +388,7 @@ export const dashboardApi = {
 
   // New Reservation APIs
   getStandardReservations: async (token: string, numRecords: number = 100): Promise<StandardReservation[]> => {
-    const response = await fetch(`${getBaseUrl()}/reservations/?num_records=${numRecords}`, {
+    const response = await fetch(`${getBaseUrl()}/reservations/?order_by_field=updated_at&order_by_type=DESC&num_records=${numRecords}`, {
       headers: getAuthHeaders(token),
     });
     const data: ApiResponse<StandardReservation> = await response.json();
@@ -396,7 +396,7 @@ export const dashboardApi = {
   },
 
   getAdhocReservations: async (token: string, numRecords: number = 100): Promise<AdhocReservation[]> => {
-    const response = await fetch(`${getBaseUrl()}/adhoc/reservations/?num_records=${numRecords}`, {
+    const response = await fetch(`${getBaseUrl()}/adhoc/reservations/?order_by_field=updated_at&order_by_type=DESC&num_records=${numRecords}`, {
       headers: getAuthHeaders(token),
     });
     const data: ApiResponse<AdhocReservation> = await response.json();
@@ -437,7 +437,7 @@ export const dashboardApi = {
     locationId: number,
     numRecords: number = 100,
   ): Promise<StandardReservation[]> => {
-    const response = await fetch(`${getBaseUrl()}/reservations/?location_id=${locationId}&num_records=${numRecords}`, {
+    const response = await fetch(`${getBaseUrl()}/reservations/?location_id=${locationId}&order_by_field=updated_at&order_by_type=DESC&num_records=${numRecords}`, {
       headers: getAuthHeaders(token),
     });
     const data: ApiResponse<StandardReservation> = await response.json();
@@ -450,7 +450,7 @@ export const dashboardApi = {
     numRecords: number = 100,
   ): Promise<AdhocReservation[]> => {
     const response = await fetch(
-      `${getBaseUrl()}/adhoc/reservations/?location_id=${locationId}&num_records=${numRecords}`,
+      `${getBaseUrl()}/adhoc/reservations/?location_id=${locationId}&order_by_field=updated_at&order_by_type=DESC&num_records=${numRecords}`,
       {
         headers: getAuthHeaders(token),
       },
@@ -469,7 +469,7 @@ export const dashboardApi = {
   },
 
   getPodLogs: async (token: string, podId: number, numRecords: number = 100): Promise<LogEntry[]> => {
-    const response = await fetch(`${getLogsBaseUrl()}logs/?record_id=${podId}&num_records=${numRecords}`, {
+    const response = await fetch(`${getLogsBaseUrl()}logs/?record_id=${podId}&order_by_field=updated_at&order_by_type=DESC&num_records=${numRecords}`, {
       headers: getAuthHeaders(token),
     });
     const data: ApiResponse<LogEntry> = await response.json();
