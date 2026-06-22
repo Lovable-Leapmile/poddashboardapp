@@ -144,6 +144,10 @@ const PodDetail: React.FC<PodDetailProps> = ({ podId, onBack }) => {
                     <span className="ml-1 text-gray-900">{formatValue(podDetail.pod_numtotaldoors)}</span>
                   </div>
                   <div className="truncate">
+                    <span className="text-gray-600 font-medium">LOCATION ID:</span>
+                    <span className="ml-1 text-gray-900">{formatValue(podDetail.location_id)}</span>
+                  </div>
+                  <div className="truncate">
                     <span className="text-gray-600 font-medium">LOCATION:</span>
                     <span className="ml-1 text-gray-900">{formatValue(podDetail.location_name)}</span>
                   </div>
