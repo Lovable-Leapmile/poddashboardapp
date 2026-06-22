@@ -162,6 +162,15 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
       cellClass: "text-center",
     },
     {
+      field: "pinged_at",
+      headerName: "Pinged At",
+      sortable: true,
+      filter: true,
+      flex: 1.5,
+      minWidth: 140,
+      cellClass: "text-muted-foreground text-center",
+    },
+    {
       field: "pod_health",
       headerName: "Health",
       sortable: true,
@@ -406,6 +415,9 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
                           <div className="flex items-center justify-between">
                             <span className="text-sm font-medium text-gray-700">Status:</span>
                             <StatusBadge status={pod.status} />
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-medium text-gray-700">Pinged At:</span> {pod.pinged_at}
                           </div>
                           <div className="text-sm">
                             <span className="font-medium text-gray-700">Health:</span> {pod.pod_health}
