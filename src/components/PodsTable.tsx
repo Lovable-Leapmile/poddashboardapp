@@ -170,7 +170,7 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
       filter: true,
       flex: 1,
       minWidth: 100,
-      cellRenderer: ({ data }: { data: Pod }) => <StatusBadge pingedAt={data.pinged_at} />,
+      cellRenderer: ({ value }: { value: string }) => <StatusBadge status={value} />,
       cellClass: "text-center",
     },
     {
