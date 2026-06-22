@@ -43,7 +43,7 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
 
   const { filters, setFilters, filteredData, resetFilters } = useTableFilters<Pod>(
     pods,
-    ["id", "pod_name", "location_name", "pod_health"],
+    ["id", "pod_name", "location_name", "location_id", "pod_health"],
     "status",
     undefined,
   );
@@ -196,6 +196,15 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
       flex: 2,
       minWidth: 150,
       cellClass: "text-muted-foreground",
+    },
+    {
+      field: "location_id",
+      headerName: "Location ID",
+      sortable: true,
+      filter: true,
+      flex: 1,
+      minWidth: 100,
+      cellClass: "text-muted-foreground text-center",
     },
     {
       headerName: "Action",
@@ -424,6 +433,9 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
                           </div>
                           <div className="text-sm">
                             <span className="font-medium text-gray-700">Doors:</span> {pod.pod_numtotaldoors}
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-medium text-gray-700">Location ID:</span> {pod.location_id}
                           </div>
                           <div className="text-sm">
                             <span className="font-medium text-gray-700">Location:</span> {pod.location_name}

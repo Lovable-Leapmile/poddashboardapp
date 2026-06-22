@@ -52,6 +52,7 @@ interface Pod {
   pod_health: string;
   pod_numtotaldoors: number;
   location_name: string;
+  location_id: number;
   pinged_at: string;
 }
 
@@ -60,6 +61,7 @@ interface PodDetail {
   pod_name: string;
   pod_numtotaldoors: number;
   location_name: string;
+  location_id: number;
   created_at: string;
   updated_at: string;
   pinged_at: string;
