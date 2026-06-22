@@ -162,6 +162,15 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
       cellClass: "text-center",
     },
     {
+      field: "pinged_at",
+      headerName: "Pinged At",
+      sortable: true,
+      filter: true,
+      flex: 1.5,
+      minWidth: 140,
+      cellClass: "text-muted-foreground text-center",
+    },
+    {
       field: "pod_health",
       headerName: "Health",
       sortable: true,
