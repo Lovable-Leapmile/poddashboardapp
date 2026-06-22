@@ -416,8 +416,15 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
                             <span className="text-sm font-medium text-gray-700">Status:</span>
                             <StatusBadge status={pod.status} />
                           </div>
-                          <div className="flex items-center justify-between">
-                            <em class=
+                          <div className="text-sm">
+                            <span className="font-medium text-gray-700">Pinged At:</span> {pod.pinged_at}
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-medium text-gray-700">Health:</span> {pod.pod_health}
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-medium text-gray-700">Doors:</span> {pod.pod_numtotaldoors}
+                          </div>
                           <div className="text-sm">
                             <span className="font-medium text-gray-700">Location:</span> {pod.location_name}
                           </div>
