@@ -44,7 +44,7 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
   const { filters, setFilters, filteredData, resetFilters } = useTableFilters<Pod>(
     pods,
     ["id", "pod_name", "location_name", "pod_health"],
-    undefined,
+    "status",
     undefined,
   );
 
@@ -54,27 +54,15 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
     if (!accessToken) return;
     setLoading(true);
     try {
-      // Fetch full dataset so search/filter work globally, not just within current page
-      const data = statusFilter === 'active'
-        ? await dashboardApi.getActivePods(accessToken)
-        : await dashboardApi.getPods(accessToken, 10000);
-      const finalData = statusFilter === 'inactive'
-        ? (data || []).filter((p) => {
-            if (!p.pinged_at) return true;
-            try {
-              const t = new Date(p.pinged_at.replace(" ", "T")).getTime();
-              return (Date.now() - t) > 5 * 60 * 1000;
-            } catch { return true; }
-          })
-        : (data || []);
-      setPods(finalData);
+      const data = await dashboardApi.getPods(accessToken, 10000);
+      setPods(data || []);
     } catch (error) {
       console.error("Error fetching pods:", error);
       setPods([]);
     } finally {
       setLoading(false);
     }
-  }, [accessToken, statusFilter]);
+  }, [accessToken]);
 
   useEffect(() => {
     fetchData();
@@ -91,8 +79,8 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
     }
   };
 
-  const StatusBadge: React.FC<{ pingedAt?: string }> = ({ pingedAt }) => {
-    const active = isPodActive(pingedAt);
+  const StatusBadge: React.FC<{ status?: string }> = ({ status }) => {
+    const active = (status || "").toLowerCase() === "active";
     return (
       <span
         className={cn(
@@ -170,7 +158,7 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
       filter: true,
       flex: 1,
       minWidth: 100,
-      cellRenderer: ({ data }: { data: Pod }) => <StatusBadge pingedAt={data.pinged_at} />,
+      cellRenderer: ({ value }: { value: string }) => <StatusBadge status={value} />,
       cellClass: "text-center",
     },
     {
@@ -417,7 +405,7 @@ const PodsTable: React.FC<PodsTableProps> = ({ onPodClick, isDashboard = false }
                           </div>
                           <div className="flex items-center justify-between">
                             <span className="text-sm font-medium text-gray-700">Status:</span>
-                            <StatusBadge pingedAt={pod.pinged_at} />
+                            <StatusBadge status={pod.status} />
                           </div>
                           <div className="text-sm">
                             <span className="font-medium text-gray-700">Health:</span> {pod.pod_health}
