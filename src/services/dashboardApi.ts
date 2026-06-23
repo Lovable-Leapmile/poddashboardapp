@@ -354,7 +354,7 @@ export const dashboardApi = {
   },
 
   getPods: async (token: string, numRecords: number = 100): Promise<Pod[]> => {
-    const response = await fetch(`${getBaseUrl()}/pods/?order_by_field=updated_at&order_by_type=DESC&num_records=${numRecords}`, {
+    const response = await fetch(`${getBaseUrl()}/pods/?status=active&order_by_field=updated_at&order_by_type=DESC&num_records=${numRecords}`, {
       headers: getAuthHeaders(token),
     });
     const data: ApiResponse<Pod> = await response.json();
