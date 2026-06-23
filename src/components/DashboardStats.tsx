@@ -40,7 +40,7 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({
     },
     {
       title: 'ACTIVE PODS',
-      value: dashboardStats.activePods.toString(),
+      value: podStats.active_pods.toString(),
       icon: Zap,
       route: '/pods',
     },
