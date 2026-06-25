@@ -43,6 +43,17 @@ const AddLocationToUserPopup: React.FC<AddLocationToUserPopupProps> = ({
   const [selectedUserId, setSelectedUserId] = useState<string>(userId ? userId.toString() : '');
   const [loading, setLoading] = useState(false);
   const [fetchingData, setFetchingData] = useState(false);
+  const [locationSearch, setLocationSearch] = useState('');
+
+  const filteredLocations = useMemo(() => {
+    const q = locationSearch.trim().toLowerCase();
+    if (!q) return locations;
+    return locations.filter((l) =>
+      l.location_name?.toLowerCase().includes(q) ||
+      l.location_address?.toLowerCase().includes(q) ||
+      String(l.id).includes(q)
+    );
+  }, [locations, locationSearch]);
 
   useEffect(() => {
     const fetchData = async () => {
