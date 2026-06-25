@@ -236,14 +236,14 @@ const AddLocationToUserPopup: React.FC<AddLocationToUserPopupProps> = ({
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={loading}>
+        <DialogFooter className="flex-col-reverse sm:flex-row sm:justify-end gap-2">
+          <Button variant="outline" onClick={onClose} disabled={loading} className="w-full sm:w-auto">
             Cancel
           </Button>
-          <Button 
-            onClick={handleSubmit} 
+          <Button
+            onClick={handleSubmit}
             disabled={loading || !selectedLocationId || !selectedUserId}
-            className="bg-[#FDDC4E] hover:bg-yellow-400 text-black"
+            className="w-full sm:w-auto bg-[#FDDC4E] hover:bg-yellow-400 text-black"
           >
             {loading ? (
               <>
