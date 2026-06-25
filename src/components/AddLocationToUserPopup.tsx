@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 import { useApiUrl } from '@/hooks/useApiUrl';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Search } from 'lucide-react';
 
 interface Location {
   id: number;
   location_name: string;
+  location_address?: string;
 }
 
 interface User {
@@ -41,6 +43,17 @@ const AddLocationToUserPopup: React.FC<AddLocationToUserPopupProps> = ({
   const [selectedUserId, setSelectedUserId] = useState<string>(userId ? userId.toString() : '');
   const [loading, setLoading] = useState(false);
   const [fetchingData, setFetchingData] = useState(false);
+  const [locationSearch, setLocationSearch] = useState('');
+
+  const filteredLocations = useMemo(() => {
+    const q = locationSearch.trim().toLowerCase();
+    if (!q) return locations;
+    return locations.filter((l) =>
+      l.location_name?.toLowerCase().includes(q) ||
+      l.location_address?.toLowerCase().includes(q) ||
+      String(l.id).includes(q)
+    );
+  }, [locations, locationSearch]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -188,29 +201,49 @@ const AddLocationToUserPopup: React.FC<AddLocationToUserPopupProps> = ({
           {/* Location Selection */}
           <div className="space-y-2">
             <Label htmlFor="location-select">Select Location</Label>
+            <div className="relative">
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              <Input
+                id="location-search"
+                placeholder="Search location by name, address or ID..."
+                value={locationSearch}
+                onChange={(e) => setLocationSearch(e.target.value)}
+                className="pl-8"
+              />
+            </div>
             <Select value={selectedLocationId} onValueChange={setSelectedLocationId}>
               <SelectTrigger id="location-select" className="w-full">
                 <SelectValue placeholder={fetchingData ? "Loading locations..." : "Select a location"} />
               </SelectTrigger>
-              <SelectContent>
-                {locations.map((location) => (
-                  <SelectItem key={location.id} value={location.id.toString()}>
-                    {location.location_name}
-                  </SelectItem>
-                ))}
+              <SelectContent className="max-h-72">
+                {filteredLocations.length === 0 ? (
+                  <div className="px-3 py-2 text-sm text-muted-foreground">
+                    No locations found
+                  </div>
+                ) : (
+                  filteredLocations.map((location) => (
+                    <SelectItem key={location.id} value={location.id.toString()}>
+                      {location.location_name}
+                      {location.location_address ? ` — ${location.location_address}` : ''}
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
+            <p className="text-xs text-muted-foreground">
+              {filteredLocations.length} of {locations.length} locations
+            </p>
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={loading}>
+        <DialogFooter className="flex-col-reverse sm:flex-row sm:justify-end gap-2">
+          <Button variant="outline" onClick={onClose} disabled={loading} className="w-full sm:w-auto">
             Cancel
           </Button>
-          <Button 
-            onClick={handleSubmit} 
+          <Button
+            onClick={handleSubmit}
             disabled={loading || !selectedLocationId || !selectedUserId}
-            className="bg-[#FDDC4E] hover:bg-yellow-400 text-black"
+            className="w-full sm:w-auto bg-[#FDDC4E] hover:bg-yellow-400 text-black"
           >
             {loading ? (
               <>
