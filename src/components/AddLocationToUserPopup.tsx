@@ -201,18 +201,38 @@ const AddLocationToUserPopup: React.FC<AddLocationToUserPopupProps> = ({
           {/* Location Selection */}
           <div className="space-y-2">
             <Label htmlFor="location-select">Select Location</Label>
+            <div className="relative">
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              <Input
+                id="location-search"
+                placeholder="Search location by name, address or ID..."
+                value={locationSearch}
+                onChange={(e) => setLocationSearch(e.target.value)}
+                className="pl-8"
+              />
+            </div>
             <Select value={selectedLocationId} onValueChange={setSelectedLocationId}>
               <SelectTrigger id="location-select" className="w-full">
                 <SelectValue placeholder={fetchingData ? "Loading locations..." : "Select a location"} />
               </SelectTrigger>
-              <SelectContent>
-                {locations.map((location) => (
-                  <SelectItem key={location.id} value={location.id.toString()}>
-                    {location.location_name}
-                  </SelectItem>
-                ))}
+              <SelectContent className="max-h-72">
+                {filteredLocations.length === 0 ? (
+                  <div className="px-3 py-2 text-sm text-muted-foreground">
+                    No locations found
+                  </div>
+                ) : (
+                  filteredLocations.map((location) => (
+                    <SelectItem key={location.id} value={location.id.toString()}>
+                      {location.location_name}
+                      {location.location_address ? ` — ${location.location_address}` : ''}
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
+            <p className="text-xs text-muted-foreground">
+              {filteredLocations.length} of {locations.length} locations
+            </p>
           </div>
         </div>
 
