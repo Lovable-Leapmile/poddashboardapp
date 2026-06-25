@@ -12,6 +12,7 @@ import { Loader2, Search } from 'lucide-react';
 interface Location {
   id: number;
   location_name: string;
+  location_address?: string;
 }
 
 interface User {
