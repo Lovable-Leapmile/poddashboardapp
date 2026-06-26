@@ -18,6 +18,10 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // Route the `sonner` package to our in-app notification shim so
+      // toasts keep working in all hosted environments without depending
+      // on the external library.
+      sonner: path.resolve(__dirname, "./src/lib/sonner-shim.ts"),
     },
     dedupe: ["react", "react-dom", "react/jsx-runtime"],
   },
