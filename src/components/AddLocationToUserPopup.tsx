@@ -198,9 +198,9 @@ const AddLocationToUserPopup: React.FC<AddLocationToUserPopupProps> = ({
             </div>
           )}
 
-          {/* Location Selection */}
+          {/* Location Selection — inline searchable list */}
           <div className="space-y-2">
-            <Label htmlFor="location-select">Select Location</Label>
+            <Label htmlFor="location-search">Select Location</Label>
             <div className="relative">
               <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
               <Input
@@ -209,29 +209,49 @@ const AddLocationToUserPopup: React.FC<AddLocationToUserPopupProps> = ({
                 value={locationSearch}
                 onChange={(e) => setLocationSearch(e.target.value)}
                 className="pl-8"
+                autoComplete="off"
               />
             </div>
-            <Select value={selectedLocationId} onValueChange={setSelectedLocationId}>
-              <SelectTrigger id="location-select" className="w-full">
-                <SelectValue placeholder={fetchingData ? "Loading locations..." : "Select a location"} />
-              </SelectTrigger>
-              <SelectContent className="max-h-72">
-                {filteredLocations.length === 0 ? (
-                  <div className="px-3 py-2 text-sm text-muted-foreground">
-                    No locations found
-                  </div>
-                ) : (
-                  filteredLocations.map((location) => (
-                    <SelectItem key={location.id} value={location.id.toString()}>
-                      {location.location_name}
-                      {location.location_address ? ` — ${location.location_address}` : ''}
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
+            <div className="border rounded-md max-h-64 overflow-y-auto bg-background">
+              {fetchingData ? (
+                <div className="px-3 py-4 text-sm text-muted-foreground text-center">
+                  Loading locations...
+                </div>
+              ) : filteredLocations.length === 0 ? (
+                <div className="px-3 py-4 text-sm text-muted-foreground text-center">
+                  No locations found
+                </div>
+              ) : (
+                <ul className="divide-y">
+                  {filteredLocations.map((location) => {
+                    const idStr = location.id.toString();
+                    const selected = selectedLocationId === idStr;
+                    return (
+                      <li key={location.id}>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedLocationId(idStr)}
+                          className={`w-full text-left px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground ${
+                            selected ? 'bg-accent text-accent-foreground font-medium' : ''
+                          }`}
+                        >
+                          <div className="truncate">{location.location_name}</div>
+                          {location.location_address && (
+                            <div className="text-xs text-muted-foreground truncate">
+                              {location.location_address}
+                            </div>
+                          )}
+                          <div className="text-[10px] text-muted-foreground">ID: {location.id}</div>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
             <p className="text-xs text-muted-foreground">
               {filteredLocations.length} of {locations.length} locations
+              {selectedLocationId && ' • 1 selected'}
             </p>
           </div>
         </div>
