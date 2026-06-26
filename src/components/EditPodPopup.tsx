@@ -71,7 +71,14 @@ const EditPodPopup: React.FC<EditPodPopupProps> = ({ open, onOpenChange, podData
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(
+          formData.pod_connection_method === "Wifi"
+            ? formData
+            : (() => {
+                const { pod_wifi_ssid, pod_wifi_password, ...rest } = formData;
+                return rest;
+              })()
+        ),
       });
 
       if (response.ok) {
