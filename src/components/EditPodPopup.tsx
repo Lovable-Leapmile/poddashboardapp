@@ -23,7 +23,7 @@ interface PodUpdateData {
   pod_state: string;
   pod_connection_method: string;
   pod_mode: string;
-  pod_wifi_id: string;
+  pod_wifi_ssid: string;
   pod_wifi_password: string;
 }
 
@@ -40,7 +40,7 @@ const EditPodPopup: React.FC<EditPodPopupProps> = ({ open, onOpenChange, podData
     pod_state: "",
     pod_connection_method: "",
     pod_mode: "",
-    pod_wifi_id: "",
+    pod_wifi_ssid: "",
     pod_wifi_password: "",
   });
 
@@ -54,7 +54,7 @@ const EditPodPopup: React.FC<EditPodPopupProps> = ({ open, onOpenChange, podData
         pod_state: podData.pod_state || "",
         pod_connection_method: podData.pod_connection_method || "",
         pod_mode: podData.pod_mode || "",
-        pod_wifi_id: (podData as any).pod_wifi_id || "",
+        pod_wifi_ssid: (podData as any).pod_wifi_ssid || "",
         pod_wifi_password: (podData as any).pod_wifi_password || "",
       });
     }
@@ -213,11 +213,11 @@ const EditPodPopup: React.FC<EditPodPopupProps> = ({ open, onOpenChange, podData
             {formData.pod_connection_method === "Wifi" && (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="pod_wifi_id">Wifi ID</Label>
+                  <Label htmlFor="pod_wifi_ssid">Wifi ID</Label>
                   <Input
-                    id="pod_wifi_id"
-                    value={formData.pod_wifi_id}
-                    onChange={(e) => updateFormField("pod_wifi_id", e.target.value)}
+                    id="pod_wifi_ssid"
+                    value={formData.pod_wifi_ssid}
+                    onChange={(e) => updateFormField("pod_wifi_ssid", e.target.value)}
                     placeholder="Enter Wifi ID"
                   />
                 </div>
