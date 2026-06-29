@@ -210,7 +210,7 @@ const EditPodPopup: React.FC<EditPodPopupProps> = ({ open, onOpenChange, podData
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Standard">Standard</SelectItem>
-                  <SelectItem value="Adhoc">Adhoc</SelectItem>
+                  <SelectItem value="adhoc">adhoc</SelectItem>
                   <SelectItem value="Static">Static</SelectItem>
                   <SelectItem value="Dynamic">Dynamic</SelectItem>
                 </SelectContent>
