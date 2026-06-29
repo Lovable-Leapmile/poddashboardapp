@@ -72,7 +72,7 @@ const EditPodPopup: React.FC<EditPodPopupProps> = ({ open, onOpenChange, podData
           "Content-Type": "application/json",
         },
         body: JSON.stringify(
-          formData.pod_connection_method === "Wifi"
+          formData.pod_connection_method === "WiFi"
             ? formData
             : (() => {
                 const { pod_wifi_ssid, pod_wifi_password, ...rest } = formData;
@@ -197,7 +197,7 @@ const EditPodPopup: React.FC<EditPodPopupProps> = ({ open, onOpenChange, podData
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Sim">Sim</SelectItem>
-                  <SelectItem value="Wifi">Wifi</SelectItem>
+                  <SelectItem value="WiFi">WiFi</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -217,26 +217,26 @@ const EditPodPopup: React.FC<EditPodPopupProps> = ({ open, onOpenChange, podData
               </Select>
             </div>
 
-            {formData.pod_connection_method === "Wifi" && (
+            {formData.pod_connection_method === "WiFi" && (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="pod_wifi_ssid">Wifi ID</Label>
+                  <Label htmlFor="pod_wifi_ssid">WiFi ID</Label>
                   <Input
                     id="pod_wifi_ssid"
                     value={formData.pod_wifi_ssid}
                     onChange={(e) => updateFormField("pod_wifi_ssid", e.target.value)}
-                    placeholder="Enter Wifi ID"
+                    placeholder="Enter WiFi ID"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="pod_wifi_password">Wifi Password</Label>
+                  <Label htmlFor="pod_wifi_password">WiFi Password</Label>
                   <Input
                     id="pod_wifi_password"
                     type="password"
                     value={formData.pod_wifi_password}
                     onChange={(e) => updateFormField("pod_wifi_password", e.target.value)}
-                    placeholder="Enter Wifi Password"
+                    placeholder="Enter WiFi Password"
                   />
                 </div>
               </>
