@@ -69,7 +69,7 @@ const EditModePopup: React.FC<EditModePopupProps> = ({
                 <SelectValue placeholder="Select mode" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Adhoc">Adhoc</SelectItem>
+                <SelectItem value="adhoc">adhoc</SelectItem>
                 <SelectItem value="Standard">Standard</SelectItem>
               </SelectContent>
             </Select>
