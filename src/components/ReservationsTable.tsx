@@ -56,7 +56,7 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
 
   const adhocFilters = useTableFilters(
     adhocReservations,
-    ["pod_name", "user_phone"],
+    ["pod_name", "user_phone", "location_name"],
     "reservation_status",
     "drop_time",
   );
@@ -201,6 +201,13 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
       field: "user_phone",
       flex: 2,
       minWidth: 130,
+      cellClass: "text-muted-foreground",
+    },
+    {
+      headerName: "Location",
+      field: "location_name",
+      flex: 2,
+      minWidth: 150,
       cellClass: "text-muted-foreground",
     },
     {
@@ -507,6 +514,9 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
                             <div className="space-y-2">
                               <div className="text-sm">
                                 <span className="font-medium text-gray-700">User Phone:</span> {reservation.user_phone}
+                              </div>
+                              <div className="text-sm">
+                                <span className="font-medium text-gray-700">Location:</span> {reservation.location_name}
                               </div>
                               <div className="text-sm">
                                 <span className="font-medium text-gray-700">Drop Time:</span>{" "}
