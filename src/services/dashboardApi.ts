@@ -138,6 +138,7 @@ interface AdhocReservation {
   pickup_time: string;
   rto_picktime: string;
   reservation_status: string;
+  location_name: string;
 }
 
 interface StandardReservationDetail {
